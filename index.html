@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sawada｜業務自動化 / Google Workspace / Web制作</title>
+<meta name="description" content="手で繰り返している工程を、1本の線に置き換えます。平日夜間と土日で対応しています。やり取りはチャットのみ、通話・訪問は行いません。">
+<link rel="canonical" href="https://wada3333.github.io/portfolio/">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#EDF0F2">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="sawada">
+<meta property="og:title" content="sawada｜業務自動化 / Google Workspace / Web制作">
+<meta property="og:description" content="手で繰り返している工程を、1本の線に置き換えます。平日夜間と土日で対応しています。やり取りはチャットのみ、通話・訪問は行いません。">
+<meta property="og:url" content="https://wada3333.github.io/portfolio/">
+<meta property="og:image" content="https://wada3333.github.io/portfolio/assets/og.png">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="sawada｜業務自動化 / Google Workspace / Web制作">
+<meta name="twitter:description" content="手で繰り返している工程を、1本の線に置き換えます。平日夜間と土日で対応しています。やり取りはチャットのみ、通話・訪問は行いません。">
+<meta name="twitter:image" content="https://wada3333.github.io/portfolio/assets/og.png">
+
+<!-- 書体は自ドメインから配る。Google Fonts の text= サブセット（このページで使う501字だけ）を
+     assets/fonts/ に取り込んだもの。node tools/font-url.mjs -> node tools/fonts.mjs で再生成する。
+     fonts.googleapis.com -> fonts.gstatic.com と別オリジンを2つ踏むと、モバイルの実効回線では
+     DNS/TLS の往復だけで FCP が 3.0秒（Performance 87）になる。同一オリジンなら往復が要らない。
+     Inter Tight / Zen Kaku Gothic New はいずれも SIL Open Font License（assets/fonts/OFL.txt）。 -->
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/zen-kaku-gothic-new-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/zen-kaku-gothic-new-700.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/inter-tight-500.woff2">
+
+<style>
+@font-face{font-family:'Inter Tight';font-style:normal;font-weight:500;font-display:swap;src:url(assets/fonts/inter-tight-500.woff2) format('woff2')}
+@font-face{font-family:'Inter Tight';font-style:normal;font-weight:700;font-display:swap;src:url(assets/fonts/inter-tight-700.woff2) format('woff2')}
+@font-face{font-family:'Zen Kaku Gothic New';font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/zen-kaku-gothic-new-400.woff2) format('woff2')}
+@font-face{font-family:'Zen Kaku Gothic New';font-style:normal;font-weight:700;font-display:swap;src:url(assets/fonts/zen-kaku-gothic-new-700.woff2) format('woff2')}
+
+/* ===========================================================================
+   トークン（portfolio-lp-spec.md §1）
+   --mute だけ #63707E から #5F6C7A に落としている。#63707E は --paper 上で
+   4.42:1 しかなく、14px のキャプションで WCAG AA（4.5:1）に届かないため。
+   =========================================================================== */
+:root{
+  --ink:#101826;
+  --paper:#EDF0F2;
+  --paper-deep:#DDE3E8;
+  --line:#1F5FBF;
+  --terminal:#E8B10D;
+  --mute:#5F6C7A;
+
+  --fs-hero:clamp(2rem, 5.2vw, 3.4rem);
+  --fs-h2:1.75rem;
+  --fs-h3:1.25rem;
+  --fs-body:1rem;
+  --fs-small:.875rem;
+
+  --font:"Inter Tight","Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","Yu Gothic UI","Noto Sans JP",Meiryo,sans-serif;
+
+  --measure:34em;
+  --page:64rem;
+  --gutter:clamp(1.25rem, 4vw, 2rem);
+  --rail:2.75rem;
+  --sec:clamp(3.25rem, 7vw, 5.5rem);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font);
+  font-size:var(--fs-body);
+  font-weight:400;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  text-underline-offset:.22em;
+}
+h1,h2,h3,p,ul,ol,dl,dd,figure,blockquote{margin:0}
+ul,ol{padding:0;list-style:none}
+img{display:block;max-width:100%;height:auto}
+a{color:var(--line)}
+h1,h2,h3{font-feature-settings:"palt" 1;font-weight:700;word-break:auto-phrase}
+:focus-visible{outline:2px solid var(--terminal);outline-offset:2px}
+
+.skip{position:absolute;left:var(--gutter);top:0;z-index:20;padding:.7rem 1.1rem;background:var(--ink);color:var(--paper);text-decoration:none;transform:translateY(-150%)}
+.skip:focus{transform:translateY(0)}
+
+/* --- ヘッダー（固定） ------------------------------------------------- */
+.head{position:sticky;top:0;z-index:10;background:var(--paper);border-bottom:1px solid var(--paper-deep)}
+.head__in{max-width:var(--page);margin-inline:auto;padding:.7rem var(--gutter);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.head__name{display:block;font-size:1.0625rem;font-weight:700;letter-spacing:.04em;line-height:1.3}
+.head__role{display:block;font-size:.75rem;color:var(--mute);line-height:1.5;margin-top:.15rem}
+.head__right{display:flex;align-items:center;gap:clamp(.75rem,3vw,1.5rem);flex:none}
+.status{display:inline-flex;align-items:center;gap:.4rem;font-size:var(--fs-small);white-space:nowrap}
+/* ここだけは丸。結線図の「端子」（角のない四角）と、稼働状況のドットを描き分ける */
+.status::before{content:"";width:.55rem;height:.55rem;border-radius:50%;background:var(--terminal)}
+.head__cta{font-size:var(--fs-small);font-weight:700;color:var(--ink);text-decoration:none;white-space:nowrap;padding:.35rem 0;border-bottom:2px solid var(--terminal)}
+.head__cta:hover{border-bottom-width:3px}
+
+/* --- 導線（左の縦線）と端子 -------------------------------------------- */
+.rail{position:relative;max-width:var(--page);margin-inline:auto;padding-inline:var(--gutter)}
+.rail::before{content:"";position:absolute;left:var(--gutter);top:0;bottom:0;width:1px;background:var(--line);opacity:.4}
+.rail__in{padding-left:var(--rail);padding-bottom:var(--sec)}
+
+/* 節どうしの間隔は上側だけで作る。上下を足すと導線が間延びする */
+.sec{padding-top:var(--sec)}
+.sec>h2{position:relative;font-size:var(--fs-h2);line-height:1.35}
+/* 導線から枝分かれするエルボー。角丸はこの折り返しだけに使う */
+.sec>h2::before{
+  content:"";position:absolute;left:calc(-1*var(--rail));top:-.9em;
+  width:calc(var(--rail) - .7rem);height:calc(.9em + .68em);
+  border-left:1px solid var(--line);border-bottom:1px solid var(--line);
+  border-bottom-left-radius:8px;opacity:.55;
+}
+.sec>h2::after{content:"";position:absolute;left:-.7rem;top:calc(.68em - 4px);width:8px;height:8px;background:var(--line)}
+
+/* --- ヒーロー ---------------------------------------------------------- */
+.hero{padding-top:clamp(2.75rem,7vw,4.5rem)}
+.hero h1{font-size:var(--fs-hero);line-height:1.28;letter-spacing:.01em}
+.hero__rule{width:7.5rem;height:2px;background:var(--line);margin-block:clamp(1.5rem,3.5vw,2rem) clamp(1.25rem,3vw,1.75rem)}
+.lead{max-width:var(--measure)}
+.terms{max-width:var(--measure);margin-top:clamp(1.75rem,4vw,2.5rem);padding-left:.9rem;border-left:2px solid var(--terminal);font-size:var(--fs-small);line-height:1.7;color:var(--ink)}
+
+/* --- 結線図 ------------------------------------------------------------ */
+.wire{margin-top:clamp(2rem,5vw,3rem)}
+.wire__steps{position:relative;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));column-gap:.6rem}
+/* 6工程をつなぐ導線。工程の箱が --paper 地なので、線は箱の隙間にだけ見える */
+.wire__steps::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line);opacity:.4}
+.wire__step{position:relative;background:var(--paper);border:1px solid var(--line);border-color:color-mix(in srgb,var(--line) 45%,var(--paper));padding:.5rem .25rem;text-align:center;font-size:var(--fs-small);line-height:1.5;color:var(--mute)}
+.wire__bypass{display:flex;align-items:center;gap:.85rem;margin-top:1.5rem}
+.wire__label{flex:none;font-size:var(--fs-small);font-weight:700;line-height:1.5}
+.wire__track{position:relative;flex:1 1 auto;height:3px;min-width:2rem}
+.wire__draw{position:absolute;inset:0;background:var(--line);transform:scaleX(0);transform-origin:left center;animation:wire-draw .9s cubic-bezier(.22,.61,.36,1) both}
+.wire__term{position:absolute;right:-5px;top:50%;width:11px;height:11px;margin-top:-5.5px;background:var(--terminal);opacity:0;animation:wire-light .28s ease-out .9s both}
+@keyframes wire-draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes wire-light{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+
+/* --- できること -------------------------------------------------------- */
+.skills{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(1.75rem,3.5vw,2.5rem);margin-top:2.25rem}
+.skill{border-top:1px solid var(--line);padding-top:1.1rem}
+.skill h3{font-size:var(--fs-h3);line-height:1.5}
+.skill p{margin-top:.5rem;max-width:var(--measure);font-size:var(--fs-small);line-height:1.8}
+.tasks{margin-top:1.1rem;max-width:var(--measure);font-size:var(--fs-small);line-height:1.7}
+.tasks li{position:relative;padding-left:1rem;margin-top:.55rem}
+.tasks li::before{content:"";position:absolute;left:0;top:.72em;width:.45rem;height:1px;background:var(--line)}
+
+/* --- 納めたもの -------------------------------------------------------- */
+.cases{margin-top:2.25rem;display:grid;gap:clamp(2rem,4vw,2.75rem)}
+.case{border-top:1px solid var(--line);padding-top:1.1rem}
+.case h3{font-size:var(--fs-h3);line-height:1.5}
+.case dl{margin-top:.85rem;display:grid;grid-template-columns:5.5em minmax(0,1fr);column-gap:1rem;row-gap:.35rem;max-width:calc(var(--measure) + 6.5em);font-size:var(--fs-small);line-height:1.8}
+.case dt{color:var(--mute)}
+.case dd{margin:0}
+.tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1rem}
+/* --mute は --paper-deep の上だと 4.15:1 しか出ないので、タグは地色のまま罫線で囲う */
+.tags li{border:1px solid color-mix(in srgb,var(--line) 35%,var(--paper));padding:.15rem .6rem;font-size:.8125rem;line-height:1.7;color:var(--mute)}
+
+/* --- 公開デモ ---------------------------------------------------------- */
+.demos{margin-top:2.25rem;display:grid;gap:clamp(2.5rem,5vw,3.5rem)}
+.demo h3{font-size:var(--fs-h3);line-height:1.5;border-top:1px solid var(--line);padding-top:1.1rem}
+.demo p{margin-top:.7rem;max-width:var(--measure);font-size:var(--fs-small);line-height:1.8}
+.demo__points{color:var(--mute);max-width:none}
+.demo figure{margin-top:1.35rem}
+.demo img{width:100%;border:1px solid var(--paper-deep)}
+.demo figcaption{margin-top:.6rem;font-size:var(--fs-small);line-height:1.7;word-break:break-all}
+
+/* --- 技術と資格 -------------------------------------------------------- */
+.stack{margin-top:2.25rem;display:grid;gap:1.5rem}
+.stack h3{font-size:var(--fs-h3);line-height:1.5}
+.stack p{margin-top:.35rem;font-size:var(--fs-small);line-height:1.9}
+
+/* --- 進め方 ------------------------------------------------------------ */
+.steps{margin-top:2.25rem;counter-reset:step;display:grid;gap:1.75rem}
+.step{position:relative;counter-increment:step;padding-left:3rem}
+.step::before{content:counter(step,decimal-leading-zero);position:absolute;left:0;top:.05em;font-weight:700;font-size:1.0625rem;color:var(--line);letter-spacing:.02em}
+.step h3{font-size:var(--fs-h3);line-height:1.5}
+.step p{margin-top:.3rem;max-width:var(--measure);font-size:var(--fs-small);line-height:1.8}
+
+/* --- 依頼する ---------------------------------------------------------- */
+.cta{background:var(--paper-deep);padding:clamp(1.75rem,4vw,2.5rem);margin-top:2.25rem}
+.cta p{max-width:var(--measure)}
+.btns{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:1.75rem}
+.btn{display:inline-block;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:700;font-size:.9375rem;line-height:1.5;padding:.85rem 1.5rem;border-bottom:3px solid var(--terminal)}
+.btn:hover{background:#1b2740}
+.btn-note{margin-top:1rem;font-size:var(--fs-small);line-height:1.7}
+
+/* --- フッター ---------------------------------------------------------- */
+.foot{border-top:1px solid var(--paper-deep)}
+.foot__in{max-width:var(--page);margin-inline:auto;padding:1.5rem var(--gutter);display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;justify-content:space-between;font-size:var(--fs-small);line-height:1.7}
+.foot__name{color:var(--mute);letter-spacing:.02em}
+
+/* --- 狭い画面 ---------------------------------------------------------- */
+@media (max-width:56.24em){
+  .skills{grid-template-columns:1fr}
+  .wire__steps{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:1.25rem}
+  .wire__steps::before{display:none}
+  .wire__step::after{content:"";position:absolute;right:-.6rem;top:50%;width:.6rem;height:1px;background:var(--line);opacity:.4}
+  .wire__step:nth-child(3n)::after,.wire__step:last-child::after{display:none}
+}
+@media (max-width:47.99em){
+  .rail::before{display:none}
+  .rail__in{padding-left:0}
+  .sec>h2{padding-left:1.75rem}
+  .sec>h2::before{left:0;top:.68em;width:1.15rem;height:0;border-left:0;border-bottom:1px solid var(--line);border-radius:0}
+  .sec>h2::after{left:1.15rem}
+  .case dl{grid-template-columns:1fr;row-gap:0}
+  .case dt{margin-top:.6rem}
+  .btn{flex:1 1 100%;text-align:center}
+}
+@media (max-width:34.99em){
+  /* 結線図は縦積みに切り替える。導線は工程の箱の裏を縦に通す */
+  .wire__steps{grid-template-columns:1fr;row-gap:.85rem}
+  .wire__steps::before{display:block;left:1.25rem;right:auto;top:0;bottom:0;width:1px;height:auto}
+  .wire__step{text-align:left;padding-left:2.5rem}
+  .wire__step::after{display:none}
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .wire__draw{animation:none;transform:none}
+  .wire__term{animation:none;opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">本文へスキップ</a>
+
+<header class="head">
+  <div class="head__in">
+    <div>
+      <span class="head__name">sawada</span>
+      <span class="head__role">業務自動化 / Google Workspace / Web制作</span>
+    </div>
+    <div class="head__right">
+      <span class="status">受付中</span>
+      <a class="head__cta" href="#contact">依頼する</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="rail">
+<div class="rail__in">
+
+  <section class="hero">
+    <h1>手で繰り返している工程を、<br>1本の線に置き換えます。</h1>
+    <div class="hero__rule"></div>
+    <p class="lead">通信インフラの構築現場で8年、プロジェクトリーダーとしてシステム導入と運用の自動化をやってきました。その手法を、そのまま中小規模の業務に持ち込みます。スプレッドシートの転記、メールの仕分け、集計と通知——動かし続ける前提で組みます。</p>
+
+    <div class="wire">
+      <ul class="wire__steps">
+        <li class="wire__step">受信</li>
+        <li class="wire__step">転記</li>
+        <li class="wire__step">突合</li>
+        <li class="wire__step">集計</li>
+        <li class="wire__step">作成</li>
+        <li class="wire__step">通知</li>
+      </ul>
+      <p class="wire__bypass">
+        <span class="wire__label">自動化後</span>
+        <span class="wire__track"><span class="wire__draw"></span><span class="wire__term"></span></span>
+      </p>
+    </div>
+
+    <p class="terms">平日夜間と土日で対応しています。やり取りはチャットのみ、通話・訪問は行いません。</p>
+  </section>
+
+  <section class="sec" id="skills">
+    <h2>できること</h2>
+    <div class="skills">
+      <div class="skill">
+        <h3>業務自動化（GAS・API連携）</h3>
+        <p>Google Apps Scriptを中心に、いま人がやっている手順をそのまま置き換えます。動かしたあとに壊れないよう、エラー時の通知と復旧手順まで含めて納品します。</p>
+        <ul class="tasks">
+          <li>Gmail受信 → 内容判定 → スプレッドシート記録</li>
+          <li>複数ブックの突合・集計・帳票出力</li>
+          <li>フォーム受付から通知・台帳更新までの一気通貫</li>
+          <li>外部API（OpenAI / Gemini など）を挟んだ自動仕分け</li>
+        </ul>
+      </div>
+      <div class="skill">
+        <h3>Google Workspace 運用・管理</h3>
+        <p>大規模なアカウント／端末管理で使ってきた運用設計を、そのまま縮小して提供します。組織の作り方と権限の切り方を最初に決めておくと、後の事故がほぼなくなります。</p>
+        <ul class="tasks">
+          <li>組織部門・グループ・共有ドライブの設計</li>
+          <li>端末（Chrome OS等）の一括登録とポリシー適用</li>
+          <li>外部共有・アクセス権限のトラブル調査と是正</li>
+          <li>Directory APIによる棚卸し・台帳自動生成</li>
+        </ul>
+      </div>
+      <div class="skill">
+        <h3>Web制作（LP・フォーム連携）</h3>
+        <p>見た目だけでなく、送信された内容がどこに溜まって誰に届くかまで作ります。サーバー不要の構成にして、運用費をかけずに保守できる形で渡します。</p>
+        <ul class="tasks">
+          <li>ランディングページの設計・実装・公開</li>
+          <li>フォーム → スプレッドシート → 通知の非同期連携</li>
+          <li>表示速度・アクセシビリティの担保</li>
+          <li>計測イベントの設計と設置</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="works">
+    <h2>納めたもの</h2>
+    <div class="cases">
+      <article class="case">
+        <h3>Case 1 — 商業施設の出店テナント調査リスト</h3>
+        <dl>
+          <dt>課題</dt><dd>イベント協業の候補先を探すため、施設ごとの入居店舗を横断で集める必要があった</dd>
+          <dt>やったこと</dt><dd>対象施設の店舗情報を収集し、項目を揃えたスプレッドシートに整形して納品</dd>
+          <dt>結果</dt><dd>納期内に検収完了。発注者から満足の評価を受領</dd>
+        </dl>
+        <ul class="tags"><li>データ収集</li><li>スプレッドシート整形</li></ul>
+      </article>
+      <article class="case">
+        <h3>Case 2 — 電子部材の仕様・調達先調査</h3>
+        <dl>
+          <dt>課題</dt><dd>開発中デバイスに使う部材の候補と入手経路を短期間で洗い出したかった</dd>
+          <dt>やったこと</dt><dd>仕様条件に合致する部材を調査し、比較可能な形で一覧化</dd>
+          <dt>結果</dt><dd>完遂。以降も継続して相談を受ける関係になった</dd>
+        </dl>
+        <ul class="tags"><li>技術調査</li><li>比較整理</li></ul>
+      </article>
+      <article class="case">
+        <h3>Case 3 — 勤怠管理システム（自社開発）</h3>
+        <dl>
+          <dt>課題</dt><dd>打刻と集計が分かれていて、残業の超過に気づくのが月末になっていた</dd>
+          <dt>やったこと</dt><dd>GASとHTML Serviceで打刻・有給申請・集計を1つに統合。36協定の超過を事前予測し、給与概算を自動でメール配信する仕組みを実装</dd>
+          <dt>結果</dt><dd>月次の集計作業と、超過の見落としをなくした</dd>
+        </dl>
+        <ul class="tags"><li>Google Apps Script</li><li>HTML Service</li><li>自動メール配信</li></ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec" id="demos">
+    <h2>公開デモ</h2>
+    <div class="demos">
+      <article class="demo">
+        <h3>株式会社クロステック・アーキテクツ（架空）</h3>
+        <p>中小企業向けの業務自動化コンサルを想定したBtoBサイト。導入効果を試算するスライダーと、サーバーを使わないフォーム送信を実装しています。</p>
+        <p class="demo__points">見どころ: ROIシミュレーター / Google Apps Script連携フォーム / ダークモード</p>
+        <figure>
+          <img src="assets/images/demo-crosstech.webp" width="1440" height="900" loading="lazy" decoding="async"
+               alt="CROSSTECH ARCHITECTS のトップページ。暗い執務室の写真の上に「バックオフィスを、次世代のエンジンへ。」という見出しと、無料シミュレーション・相談のボタンが置かれている。">
+          <figcaption><a href="https://wada3333.github.io/crosstech-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/crosstech-lp/</a></figcaption>
+        </figure>
+      </article>
+      <article class="demo">
+        <h3>STUDIO CORE（架空）</h3>
+        <p>パーソナルジムを題材にした、申し込み導線重視のBtoC向けLP。空き枠の表示から申し込み完了までを1画面で完結させています。</p>
+        <p class="demo__points">見どころ: 予約フォームの空き枠連携 / 表示速度 / 計測イベント設計</p>
+        <figure>
+          <img src="assets/images/demo-studio-core.webp" width="1440" height="900" loading="lazy" decoding="async"
+               alt="STUDIO CORE のトップページ。明るい個室スタジオの写真の上に「続かなかった人が、続けている。」という見出しと、無料カウンセリングを予約するボタンが置かれている。">
+          <figcaption><a href="https://wada3333.github.io/studio-core-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/studio-core-lp/</a></figcaption>
+        </figure>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec" id="stack">
+    <h2>技術と資格</h2>
+    <div class="stack">
+      <div>
+        <h3>作るもの</h3>
+        <p>Google Apps Script / JavaScript (ES6+) / HTML5 / CSS3 / Python / Google Sheets API / Directory API / 各種LLM API</p>
+      </div>
+      <div>
+        <h3>運用と設計</h3>
+        <p>Google Workspace管理 / ネットワーク構築 / 資産管理 / プロジェクト管理（PL歴8年）</p>
+      </div>
+      <div>
+        <h3>資格</h3>
+        <p>Tableau Data Saber / CompTIA Project+ / Microsoft Azure Fundamentals (AZ-900) / 工事担任者 AI・DD総合種 / 電気通信工事施工管理 / ビジネス統計スペシャリスト（エクセル分析 上級）/ 日商簿記2級</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="flow">
+    <h2>進め方</h2>
+    <ol class="steps">
+      <li class="step">
+        <h3>相談</h3>
+        <p>現在の手順を、実際の画面やファイルで見せてください。文章の説明より速く正確に把握できます。</p>
+      </li>
+      <li class="step">
+        <h3>範囲を決める</h3>
+        <p>できること・できないこと・想定作業時間をこちらから提示します。ここで折り合わなければ辞退します。</p>
+      </li>
+      <li class="step">
+        <h3>作る</h3>
+        <p>進捗は区切りごとにチャットで共有します。動くものを早めに見せる進め方をとります。</p>
+      </li>
+      <li class="step">
+        <h3>確認</h3>
+        <p>実データで動かして確認していただきます。修正はこの段階に含みます。</p>
+      </li>
+      <li class="step">
+        <h3>引き渡し</h3>
+        <p>操作手順と、壊れたときの対処をドキュメントで渡します。</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="sec" id="contact">
+    <h2>手順を見せていただくところから始めます。</h2>
+    <div class="cta">
+      <p>何を自動化できるか決まっていない段階でも構いません。いまの手順を見せていただければ、そもそも自動化すべきかどうかから一緒に判断します。</p>
+      <div class="btns">
+        <a class="btn" href="https://www.lancers.jp/profile/sawada3333" target="_blank" rel="noopener noreferrer">ランサーズで相談する</a>
+        <a class="btn" href="https://crowdworks.jp/public/employees/7046598" target="_blank" rel="noopener noreferrer">クラウドワークスで相談する</a>
+      </div>
+      <p class="btn-note">平日夜間・土日に対応します。チャットでのやり取りのみです。</p>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<footer class="foot">
+  <div class="foot__in">
+    <span class="foot__name">sawada / 2026</span>
+    <a href="https://github.com/wada3333" target="_blank" rel="noopener noreferrer">https://github.com/wada3333</a>
+  </div>
+</footer>
+</body>
+</html>
