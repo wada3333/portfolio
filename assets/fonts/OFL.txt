@@ -1,0 +1,8 @@
+Inter Tight — Copyright (c) 2020 The Inter Project Authors (https://github.com/rsms/inter)
+Zen Kaku Gothic New — Copyright (c) 2020 The Zen Kaku Gothic New Project Authors (https://github.com/googlefonts/zen-kakugothic)
+
+いずれも SIL Open Font License, Version 1.1 のもとで配布されている。
+ライセンス全文: https://openfontlicense.org/
+
+このディレクトリの woff2 は、Google Fonts の text= サブセット機能で
+このサイトが使う文字だけに絞ったもの。node tools/fonts.mjs で再生成できる。
