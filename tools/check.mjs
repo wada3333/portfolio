@@ -257,6 +257,49 @@ try {
       ? fails.slice(0, 4).map((n) => `${n.tag}.${n.cls}「${n.text}」${n.fg} on ${n.bg} = ${ratio(n.fg, n.bg).toFixed(2)}:1`).join(' / ')
       : `${rendered.length}箇所を検査してすべて基準以上（最小 ${Math.min(...rendered.map(n => ratio(n.fg, n.bg))).toFixed(2)}:1）`);
 
+  // --- 5b. 書体のサブセット漏れ ----------------------------------------------
+  // text= サブセットなので、コピーを足して再生成し忘れると、その字だけ
+  // フォールバック書体で出る。実際に描画に使われた書体を CDP から取る。
+  // getPlatformFontsForNode は「その要素の直下のテキストノード」しか見ないので、
+  // 文字を持つ要素を全部拾って1つずつ問い合わせる。
+  await send('CSS.enable');
+  const doc = await send('DOM.getDocument', { depth: 1 });
+  const all = await send('DOM.querySelectorAll', {
+    nodeId: doc.result.root.nodeId,
+    selector: 'body, body *'
+  });
+  const tally = new Map();
+  const strayAt = [];
+  for (const nodeId of all.result.nodeIds) {
+    const p = await send('CSS.getPlatformFontsForNode', { nodeId });
+    for (const f of (p.result && p.result.fonts) || []) {
+      if (!f.glyphCount) continue;
+      tally.set(f.familyName, (tally.get(f.familyName) || 0) + f.glyphCount);
+      if (!/^(Zen Kaku Gothic New|Inter Tight)$/.test(f.familyName) && strayAt.length < 3) {
+        const d = await send('DOM.describeNode', { nodeId });
+        strayAt.push(`${(d.result.node.localName || '?')}「${f.familyName}」${f.glyphCount}字`);
+      }
+    }
+  }
+  const total = [...tally.values()].reduce((a, b) => a + b, 0);
+  record(strayAt.length === 0,
+    '本文が指定書体だけで描画されている（サブセット漏れがない）',
+    [...tally].map(([k, v]) => `${k} ${v}字`).join(' / ') + `（計${total}字）` +
+    (strayAt.length ? '  ← 指定外: ' + strayAt.join(', ') +
+      ' / node tools/font-url.mjs -> node tools/fonts.mjs で作り直すこと' : ''));
+
+  // --- 5c. JavaScript を持たないこと ----------------------------------------
+  // 「JavaScriptを使わずに組み」と公開ページに書いているので、事実として守る
+  const source = await (await fetch(BASE)).text();
+  const js = [
+    ['<script>タグ', /<script[\s>]/i.test(source)],
+    ['インラインのイベントハンドラ', / on[a-z]+\s*=/i.test(source)],
+    ['javascript: URL', /javascript:/i.test(source)]
+  ].filter(([, hit]) => hit).map(([name]) => name);
+  record(js.length === 0,
+    'JavaScript を一切含まない（公開ページの記述と一致する）',
+    js.length ? '検出: ' + js.join(', ') : '<script>・イベントハンドラ・javascript: のいずれも無し');
+
   // --- 6. 出してはいけない情報 ----------------------------------------------
   const text = await evaluate('document.body.innerText');
   const banned = ['NTT', '3万', '三万', '数万', '教育機関', '万台', '依頼番号'];
