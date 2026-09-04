@@ -103,6 +103,31 @@ try {
     `列数 ${wire.cols.split(' ').length} / ${wire.count}工程が${wire.rows}段 / 右端 ${wire.maxRight}px`
   );
 
+  // --- 2b. ヒーロー見出しが文節の切れ目でしか折り返さない -------------------
+  const heroExpr = `(() => {
+    const h = document.querySelector('.hero h1');
+    const units = [...h.querySelectorAll('.hero__u')];
+    const lines = [];
+    for (const u of units) {
+      const r = u.getBoundingClientRect();
+      const last = lines[lines.length - 1];
+      if (last && Math.abs(last.top - r.top) < 2) last.text += u.textContent;
+      else lines.push({ top: r.top, text: u.textContent });
+    }
+    return { split: units.some(u => u.getClientRects().length > 1), lines: lines.map(l => l.text) };
+  })()`;
+  const hero = {};
+  for (const [w, h] of [[375, 812], [768, 1024], [1440, 900]]) {
+    await load(w, h);
+    hero[w] = await evaluate(heroExpr);
+  }
+  record(
+    !Object.values(hero).some((r) => r.split) &&
+    hero[375].lines.length === 3 && hero[768].lines.length === 2 && hero[1440].lines.length === 2,
+    'ヒーロー見出しが文節の途中で改行しない（512px以上は2行、それ未満は3行）',
+    `375px: ${hero[375].lines.join(' / ')} ／ 1440px: ${hero[1440].lines.join(' / ')}`
+  );
+
   // --- 3. prefers-reduced-motion -------------------------------------------
   await send('Emulation.setEmulatedMedia', {
     features: [{ name: 'prefers-reduced-motion', value: 'reduce' }]
