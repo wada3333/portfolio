@@ -79,7 +79,41 @@ async function openChrome() {
 
   await send('Runtime.enable');
   await sleep(400);
-  return { send, close: () => { ws.close(); proc.kill(); } };
+  const evaluate = async (expression) => {
+    const r = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
+    if (r.result.exceptionDetails) throw new Error(JSON.stringify(r.result.exceptionDetails));
+    return r.result.result.value;
+  };
+  return { send, evaluate, close: () => { ws.close(); proc.kill(); } };
+}
+
+/** 下地のどこに図があるかをピクセルで測る（文字を置く前の状態で呼ぶ） */
+async function inkBox(evaluate, pngPath, outW, outH) {
+  const dataUri = 'data:image/png;base64,' + readFileSync(pngPath).toString('base64');
+  return JSON.parse(await evaluate(`(async () => {
+    const img = new Image();
+    img.src = ${JSON.stringify(dataUri)};
+    await img.decode();
+    const W = img.naturalWidth, H = img.naturalHeight;
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(img, 0, 0);
+    const d = ctx.getImageData(0, 0, W, H).data;
+    const at = (x, y) => { const i = (y * W + x) * 4; return [d[i], d[i+1], d[i+2]]; };
+    const bg = at(2, 2);
+    let minX = W, minY = H, maxX = -1, maxY = -1;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const p = at(x, y);
+      if (Math.abs(p[0]-bg[0]) + Math.abs(p[1]-bg[1]) + Math.abs(p[2]-bg[2]) <= 24) continue;
+      if (x < minX) minX = x; if (x > maxX) maxX = x;
+      if (y < minY) minY = y; if (y > maxY) maxY = y;
+    }
+    const sx = ${outW} / W, sy = ${outH} / H;
+    return JSON.stringify({ src: [W, H],
+      out: { minX: Math.round(minX*sx), maxX: Math.round(maxX*sx),
+             minY: Math.round(minY*sy), maxY: Math.round(maxY*sy) } });
+  })()`));
 }
 
 /** PNG を WebP に変換する。data: URI 経由なので canvas は汚染されない */
@@ -111,8 +145,15 @@ async function toWebp(send, pngPath, quality) {
  * ほぼ同じなので、トリミングではなく縮小で収める（object-fit:cover で縦2pxだけ切れる）。
  *
  * 文字の位置は下地のピクセルを走査して決めた。図の外接矩形は 1200x630 換算で
- * x 328-1151 / y 113-362。空いているのは下側 y 362-630（全幅）と左側 x 0-328
- * なので、下帯の左寄せに置く（文字ブロックの上端は y=421 で、図の下端から59px空く）。
+ * x 328-1151 / y 113-362。空いているのは下側 y 362-630（全幅268px）と
+ * 左側 x 0-328 なので、下帯の左寄せに積む。
+ *
+ * 階層は 見出し48px(700) > sawada 22px(700) > 役割行 17px(400)。sawada 以下は
+ * 署名の扱いにして、見出しが主役になるようにしている。
+ *
+ * 見出しの改行はサイトと同じ作りにする。節を display:block で2行に固定し、
+ * 文節は white-space:nowrap にして、万一収まらない場合でも文節の切れ目でしか
+ * 折り返さないようにする。
  *
  * 書体はサイトと同じ woff2 をそのまま data URI で埋める。生成時に Google Fonts へ
  * 出ないので、いつ流し直しても同じ結果になる。
@@ -133,12 +174,16 @@ body{width:1200px;height:630px;background:var(--paper);color:var(--ink);position
   font-family:"Inter Tight","Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
   font-variant-numeric:tabular-nums}
 .bg{position:absolute;inset:0;width:1200px;height:630px;object-fit:cover;object-position:center}
-.txt{position:absolute;left:72px;bottom:74px}
-.name{font-size:64px;font-weight:700;letter-spacing:.02em;line-height:1.2}
-.role{font-size:30px;font-weight:400;line-height:1.6;margin-top:10px;font-feature-settings:"palt" 1}
+.txt{position:absolute;left:72px;right:72px;bottom:48px}
+.head{font-size:48px;font-weight:700;line-height:1.25;letter-spacing:.01em;font-feature-settings:"palt" 1}
+.head .cl{display:block}
+.head .u{white-space:nowrap}
+.name{font-size:22px;font-weight:700;letter-spacing:.02em;line-height:1.2;margin-top:20px}
+.role{font-size:17px;font-weight:400;line-height:1.6;margin-top:6px;font-feature-settings:"palt" 1}
 </style></head><body>
 <img class="bg" src="${bg}" alt="">
 <div class="txt">
+  <p class="head"><span class="cl"><span class="u">手で繰り返している</span><span class="u">工程を、</span></span><span class="cl"><span class="u">1本の線に</span><span class="u">置き換えます。</span></span></p>
   <p class="name">sawada</p>
   <p class="role">業務自動化 / Google Workspace / Web制作</p>
 </div>
@@ -171,8 +216,53 @@ try {
     const html = join(work, 'og.html');
     writeFileSync(html, ogHtml(bg, fonts), 'utf8');
     const out = join(ROOT, 'assets', 'og.png');
-    shoot('file:///' + html.replace(/\\/g, '/'), out, 1200, 630);
-    console.log(`  assets/og.png  1200x630  ${(statSync(out).size / 1024).toFixed(0)}KB`);
+
+    const chrome = await openChrome();
+    try {
+      // 1) 下地の図がどこにあるかを測る
+      const ink = await inkBox(chrome.evaluate, join(ROOT, 'assets', 'og-bg.png'), 1200, 630);
+      console.log(`  下地 ${ink.src.join('x')} の図: 1200x630 換算で x ${ink.out.minX}-${ink.out.maxX} / y ${ink.out.minY}-${ink.out.maxY}`);
+
+      // 2) 文字を組んだ状態を測る
+      await chrome.send('Page.enable');
+      await chrome.send('Emulation.setDeviceMetricsOverride',
+        { width: 1200, height: 630, deviceScaleFactor: 1, mobile: false });
+      await chrome.send('Page.navigate', { url: 'file:///' + html.replace(/\\/g, '/') });
+      await sleep(1200);
+      await chrome.evaluate('document.fonts.ready.then(() => 1)');
+      await sleep(300);
+      const m = JSON.parse(await chrome.evaluate(`(() => {
+        const box = (sel) => { const r = document.querySelector(sel).getBoundingClientRect();
+          return { top: Math.round(r.top), bottom: Math.round(r.bottom), left: Math.round(r.left), right: Math.round(r.right) }; };
+        const units = [...document.querySelectorAll('.head .u')];
+        const lines = [];
+        for (const u of units) {
+          const r = u.getBoundingClientRect();
+          const last = lines[lines.length - 1];
+          if (last && Math.abs(last.top - r.top) < 2) last.text += u.textContent;
+          else lines.push({ top: r.top, text: u.textContent });
+        }
+        return JSON.stringify({ txt: box('.txt'), head: box('.head'), name: box('.name'), role: box('.role'),
+          lines: lines.map(l => l.text), split: units.some(u => u.getClientRects().length > 1) });
+      })()`));
+
+      const gap = m.txt.top - ink.out.maxY;
+      console.log(`  見出し ${m.lines.length}行: ${m.lines.join(' / ')}${m.split ? '  ⚠ 文節が途中で割れた' : ''}`);
+      console.log(`  文字ブロック y ${m.txt.top}-${m.txt.bottom} / x ${m.txt.left}-${m.txt.right}`);
+      console.log(`  見出し y ${m.head.top}-${m.head.bottom} / sawada y ${m.name.top}-${m.name.bottom} / 役割行 y ${m.role.top}-${m.role.bottom}`);
+      console.log(`  図の下端(${ink.out.maxY}) と文字の上端(${m.txt.top}) の空き: ${gap}px  下マージン ${630 - m.txt.bottom}px`);
+      if (gap <= 0) throw new Error(`文字が図に重なっている（空き ${gap}px）`);
+      if (m.lines.length > 3) throw new Error(`見出しが ${m.lines.length} 行になった（3行以内にすること）`);
+      if (m.split) throw new Error('見出しが文節の途中で改行された');
+
+      // 3) 問題なければ書き出す
+      const shot = await chrome.send('Page.captureScreenshot', { format: 'png' });
+      writeFileSync(out, Buffer.from(shot.result.data, 'base64'));
+      console.log(`  assets/og.png  1200x630  ${(statSync(out).size / 1024).toFixed(0)}KB`);
+    } finally {
+      chrome.close();
+      await sleep(400);
+    }
   }
 
   if (pngs.length) {
