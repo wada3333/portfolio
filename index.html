@@ -128,7 +128,7 @@ h1,h2,h3{font-feature-settings:"palt" 1;font-weight:700;word-break:auto-phrase}
    ようにしたうえで、2行組みが余裕をもって収まる 512px 以上でだけ
    仕様書どおりの2行に固定する。狭い幅では3行を許容する。
    336px 未満は最長の文節（約291px）自体が収まらないので nowrap を外す。 */
-@media (min-width:21em){.hero__u{white-space:nowrap}}
+@media (min-width:21.5em){.hero__u{white-space:nowrap}}
 @media (min-width:32em){.hero__cl{display:block}}
 .hero__rule{width:7.5rem;height:2px;background:var(--line);margin-block:clamp(1.5rem,3.5vw,2rem) clamp(1.25rem,3vw,1.75rem)}
 .lead{max-width:var(--measure)}
@@ -211,11 +211,16 @@ h1,h2,h3{font-feature-settings:"palt" 1;font-weight:700;word-break:auto-phrase}
   .wire__step:nth-child(3n)::after,.wire__step:last-child::after{display:none}
 }
 @media (max-width:47.99em){
-  .rail::before{display:none}
-  .rail__in{padding-left:0}
-  .sec>h2{padding-left:1.75rem}
-  .sec>h2::before{left:0;top:.68em;width:1.15rem;height:0;border-left:0;border-bottom:1px solid var(--line);border-radius:0}
-  .sec>h2::after{left:1.15rem}
+  /* 導線はページ左端の10pxの帯に残す。h2・h3・本文の左端は36px（--rail）で揃え、
+     端子だけが帯に張り出す（PCと同じ構造）。左端を28pxにすると枝が7pxしか取れず
+     「分岐」に見えないため36pxにした。本文はこれで375pxのとき幅319px・20文字。
+     エルボーの角丸は幅が足りないので、狭い幅では横線＋ドットに簡略化する。 */
+  :root{--rail:2.25rem}
+  .rail{padding-left:0}
+  .rail::before{left:.625rem}
+  .sec>h2{padding-left:0}
+  .sec>h2::before{left:calc(-1 * var(--rail) + .625rem + 1px);top:.68em;width:calc(var(--rail) - 1.25rem - 1px);height:0;border-left:0;border-bottom:1px solid var(--line);border-radius:0}
+  .sec>h2::after{left:-.625rem;top:calc(.68em - 3px);width:6px;height:6px}
   .case dl{grid-template-columns:1fr;row-gap:0}
   .case dt{margin-top:.6rem}
   .btn{flex:1 1 100%;text-align:center}

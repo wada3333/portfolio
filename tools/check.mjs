@@ -128,6 +128,24 @@ try {
     `375px: ${hero[375].lines.join(' / ')} ／ 1440px: ${hero[1440].lines.join(' / ')}`
   );
 
+  // --- 2c. 767px以下でも導線が出ていて、左端が揃っている ---------------------
+  await load(375, 812);
+  const rail = await evaluate(`(() => {
+    const spine = getComputedStyle(document.querySelector('.rail'), '::before');
+    const x = (sel) => Math.round(document.querySelector(sel).getBoundingClientRect().left);
+    return {
+      shown: spine.display !== 'none',
+      spineX: parseFloat(spine.left),
+      h2: x('#skills > h2'), h3: x('.skill h3'), body: x('.skill p'), lead: x('.lead')
+    };
+  })()`);
+  const edges = [rail.h2, rail.h3, rail.body, rail.lead];
+  record(
+    rail.shown && rail.spineX >= 8 && rail.spineX <= 12 && new Set(edges).size === 1,
+    '767px以下で縦導線が表示され、h2・h3・本文の左端が揃っている',
+    `縦線 x=${rail.spineX}px（帯8〜12px） / 左端 h2:${rail.h2} h3:${rail.h3} 本文:${rail.body} リード:${rail.lead}`
+  );
+
   // --- 3. prefers-reduced-motion -------------------------------------------
   await send('Emulation.setEmulatedMedia', {
     features: [{ name: 'prefers-reduced-motion', value: 'reduce' }]
