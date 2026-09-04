@@ -1,11 +1,14 @@
 /**
  * Google Fonts のサブセットを自ドメインに取り込む（外部依存ゼロ）
  * ---------------------------------------------------------------------------
- *   node tools/serve.mjs 8130        # 別ターミナルで起動しておく
- *   node tools/fonts.mjs
+ *   node tools/serve.mjs 8130                              # 別ターミナルで起動
+ *   node tools/fonts.mjs "$(node tools/font-url.mjs | tail -1)"
  *
  * tools/font-url.mjs が作る text= 付きURLの CSS を取得し、参照している woff2 を
  * assets/fonts/ に落として、index.html に貼る @font-face を出力する。
+ *
+ * URL は引数で渡す。index.html は自ドメイン配信に切り替えたあと Google Fonts の
+ * <link> を持たないので、そこからは読めない。
  *
  * なぜ自ドメインに置くか:
  *   fonts.googleapis.com -> fonts.gstatic.com と別オリジンを2つ経由すると、
@@ -22,11 +25,21 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'assets', 'fonts');
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36';
 
-/** index.html に書かれている Google Fonts の URL をそのまま使う */
-const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
-const m = html.match(/href="(https:\/\/fonts\.googleapis\.com\/css2\?[^"]+)"/);
-if (!m) throw new Error('index.html に Google Fonts の URL が見つかりません');
-const cssUrl = m[1].replace(/&amp;/g, '&');
+/** 第1引数の URL を使う。無ければ index.html の <link> から拾う（移行前の作り） */
+const arg = process.argv[2];
+const cssUrl = (arg && /^https:\/\/fonts\.googleapis\.com\/css2\?/.test(arg)
+  ? arg
+  : (() => {
+    const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
+    const m = html.match(/href="(https:\/\/fonts\.googleapis\.com\/css2\?[^"]+)"/);
+    if (!m) {
+      throw new Error(
+        'Google Fonts の URL が指定されていません。次のように渡してください:\n' +
+        '  node tools/fonts.mjs "$(node tools/font-url.mjs | tail -1)"'
+      );
+    }
+    return m[1];
+  })()).replace(/&amp;/g, '&');
 
 const css = await (await fetch(cssUrl, { headers: { 'User-Agent': UA } })).text();
 const faces = [...css.matchAll(/\/\*\s*\[(\d+)\]\s*\*\/|@font-face\s*\{([^}]+)\}/g)]
