@@ -105,35 +105,43 @@ async function toWebp(send, pngPath, quality) {
   return JSON.parse(res.result.result.value);
 }
 
-/** OG画像（1200x630）の下絵。サイトと同じトークンだけで組む */
-function ogHtml() {
+/**
+ * OG画像（1200x630）の下絵。
+ * 下地は assets/og-bg.png（1728x910）。縦横比 1.899 は 1200x630 の 1.905 と
+ * ほぼ同じなので、トリミングではなく縮小で収める（object-fit:cover で縦2pxだけ切れる）。
+ *
+ * 文字の位置は下地のピクセルを走査して決めた。図の外接矩形は 1200x630 換算で
+ * x 328-1151 / y 113-362。空いているのは下側 y 362-630（全幅）と左側 x 0-328
+ * なので、下帯の左寄せに置く（文字ブロックの上端は y=421 で、図の下端から59px空く）。
+ *
+ * 書体はサイトと同じ woff2 をそのまま data URI で埋める。生成時に Google Fonts へ
+ * 出ないので、いつ流し直しても同じ結果になる。
+ */
+function ogHtml(bg, fonts) {
+  const face = (family, weight, file) =>
+    `@font-face{font-family:'${family}';font-style:normal;font-weight:${weight};` +
+    `src:url(${fonts[file]}) format('woff2')}`;
   return `<!doctype html><html lang="ja"><head><meta charset="utf-8">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#101826;--paper:#EDF0F2;--paper-deep:#DDE3E8;--line:#1F5FBF;--terminal:#E8B10D;--mute:#5F6C7A}
+${face('Inter Tight', 500, 'inter-tight-500.woff2')}
+${face('Inter Tight', 700, 'inter-tight-700.woff2')}
+${face('Zen Kaku Gothic New', 400, 'zen-kaku-gothic-new-400.woff2')}
+${face('Zen Kaku Gothic New', 700, 'zen-kaku-gothic-new-700.woff2')}
+:root{--ink:#101826;--paper:#EDF0F2;--line:#1F5FBF;--terminal:#E8B10D}
 *{box-sizing:border-box;margin:0}
-body{width:1200px;height:630px;background:var(--paper);color:var(--ink);
+body{width:1200px;height:630px;background:var(--paper);color:var(--ink);position:relative;overflow:hidden;
   font-family:"Inter Tight","Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
-  display:flex;flex-direction:column;justify-content:center;padding:0 96px 0 120px;position:relative;overflow:hidden}
-body::before{content:"";position:absolute;left:64px;top:0;bottom:0;width:1px;background:var(--line);opacity:.45}
-.term{position:absolute;left:60px;width:9px;height:9px;background:var(--line)}
-.t1{top:172px}.t2{top:322px}.t3{top:472px}
-h1{font-size:66px;line-height:1.28;font-weight:700;letter-spacing:.01em;font-feature-settings:"palt" 1}
-.rule{width:132px;height:2px;background:var(--line);margin:38px 0 30px}
-.who{font-size:27px;font-weight:700;letter-spacing:.02em}
-.role{font-size:22px;color:var(--mute);margin-top:10px;line-height:1.7}
-.wire{position:absolute;right:96px;bottom:74px;display:flex;align-items:center;gap:14px}
-.wire i{display:block;width:196px;height:3px;background:var(--line)}
-.wire b{display:block;width:15px;height:15px;background:var(--terminal)}
+  font-variant-numeric:tabular-nums}
+.bg{position:absolute;inset:0;width:1200px;height:630px;object-fit:cover;object-position:center}
+.txt{position:absolute;left:72px;bottom:74px}
+.name{font-size:64px;font-weight:700;letter-spacing:.02em;line-height:1.2}
+.role{font-size:30px;font-weight:400;line-height:1.6;margin-top:10px;font-feature-settings:"palt" 1}
 </style></head><body>
-<span class="term t1"></span><span class="term t2"></span><span class="term t3"></span>
-<h1>手で繰り返している工程を、<br>1本の線に置き換えます。</h1>
-<div class="rule"></div>
-<p class="who">sawada</p>
-<p class="role">業務自動化 / Google Workspace / Web制作</p>
-<div class="wire"><i></i><b></b></div>
+<img class="bg" src="${bg}" alt="">
+<div class="txt">
+  <p class="name">sawada</p>
+  <p class="role">業務自動化 / Google Workspace / Web制作</p>
+</div>
 </body></html>`;
 }
 
@@ -151,8 +159,17 @@ try {
 
   if (mode === 'all' || mode === 'og') {
     console.log('OG画像を生成します（1200x630）');
+    // 下地と書体を data URI で埋め込む。相対パスは file:// の一時HTMLから引けないため
+    const bg = 'data:image/png;base64,' +
+      readFileSync(join(ROOT, 'assets', 'og-bg.png')).toString('base64');
+    const fonts = {};
+    for (const f of ['inter-tight-500.woff2', 'inter-tight-700.woff2',
+      'zen-kaku-gothic-new-400.woff2', 'zen-kaku-gothic-new-700.woff2']) {
+      fonts[f] = 'data:font/woff2;base64,' +
+        readFileSync(join(ROOT, 'assets', 'fonts', f)).toString('base64');
+    }
     const html = join(work, 'og.html');
-    writeFileSync(html, ogHtml(), 'utf8');
+    writeFileSync(html, ogHtml(bg, fonts), 'utf8');
     const out = join(ROOT, 'assets', 'og.png');
     shoot('file:///' + html.replace(/\\/g, '/'), out, 1200, 630);
     console.log(`  assets/og.png  1200x630  ${(statSync(out).size / 1024).toFixed(0)}KB`);
