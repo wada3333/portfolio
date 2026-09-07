@@ -303,9 +303,10 @@ figure要素で大きめに。カードにしない。
 
 ## 3. 実装要件
 
-- 単一の `index.html`（CSSは`<style>`に内包、JSは`<script>`に内包）。ビルド不要。
+- 単一の `index.html`（CSSは`<style>`に内包）。ビルド不要。
+- **JavaScript は使わない。** 必要な動きがヒーローの結線図の1回だけで、`prefers-reduced-motion` もCSSで完結するため。持たない方が「スクロール連動を付けない」を構造的に保証でき、TBT も 0ms になる。公開ページにも「JavaScriptを使わずに組み」と書いているので、事実として守る（`tools/check.mjs` が `<script>`・インラインのイベントハンドラ・`javascript:` を検査する）。
 - GitHub Pagesで公開。ルートに配置。
-- フォントはGoogle Fontsから読み込み、`font-display: swap`。
+- **書体は自ドメインから配る**（`assets/fonts/*.woff2`、`font-display: swap`）。Google Fonts から `<link>` で読んではいけない。Zen Kaku Gothic New は和文の unicode-range 分割で woff2 が60本（約560KB）落ちてきて、モバイルの Performance が 66 まで落ちる。`text=` サブセットで4本に絞っても、別オリジンを2つ踏む往復で 87 止まり。同一オリジンから配って初めて 99 になる。詳細は下記「書体の配り方」。
 - 画像はデモサイトのスクリーンショット2枚のみ。WebP、`loading="lazy"`、明示的な`width`/`height`。
 - Lighthouse: Performance / Accessibility / Best Practices / SEO すべて95以上。
 - `prefers-color-scheme` には対応しない（このLPは1テーマで完結させる）。
@@ -313,6 +314,67 @@ figure要素で大きめに。カードにしない。
 - フォーム・問い合わせ機能は載せない。導線は外部プロフィールへのリンクのみ。
 - キーボードフォーカスは`--terminal`の2px実線アウトラインで明示する。
 - 見出しは h1 → h2 → h3 の順序を崩さない。
+
+### 書体の配り方
+
+Google Fonts から取得した woff2 を `assets/fonts/` に置き、`@font-face` を `<style>` に内包して自ドメインから配る。CDN の `<link>` は使わない。
+
+モバイルの Lighthouse Performance を3段階で実測した結果:
+
+| 構成 | Performance | FCP |
+|---|---|---|
+| Google Fonts を素の `<link>` で読む | 66 | 5,485ms |
+| Google Fonts ＋ `text=` サブセット ＋ 非同期読み込み | 87 | 2,957ms |
+| **自ドメイン配信（採用）** | **99** | **908ms** |
+
+`text=` で60本→4本（169KB）に絞っても、`fonts.googleapis.com` → `fonts.gstatic.com` と別オリジンを2つ踏む DNS/TLS の往復だけで 87 止まりだった。「Performance 95以上」と「Google Fonts から読み込み」は両立しない。
+
+書体は Inter Tight / Zen Kaku Gothic New。いずれも SIL Open Font License で再配布が認められている（`assets/fonts/OFL.txt` を同梱）。
+
+**コピーを変えたらサブセットを作り直すこと。**
+
+```bash
+node tools/serve.mjs 8130
+node tools/fonts.mjs "$(node tools/font-url.mjs | tail -1)"
+```
+
+`text=` サブセットなので、これを忘れると**足した字だけフォールバック書体（Yu Gothic 等）で出る**。見落としやすいので `tools/check.mjs` が CDP の `CSS.getPlatformFontsForNode` を文字を持つ全要素に回し、指定書体以外が使われていないか検査する。
+
+### OG画像（`assets/og.png`）
+
+`assets/og-bg.png`（1728×910、結線図を描いた下地）を背景に、`node tools/capture.mjs og` で生成する。
+
+縦横比 1.899 は 1200×630 の 1.905 とほぼ同じなので、**トリミングではなく縮小**で収める（`object-fit: cover` で縦2pxだけ切れる。図を欠かずに済む）。
+
+文字の位置は下地のピクセルを走査して決めた。実測値:
+
+| | 1200×630 換算 |
+|---|---|
+| 図の外接矩形 | x **328–1151** / y **112–361** |
+| 空き（下側） | y **362–630**（全幅・268px） |
+| 空き（左側） | x **0–328**（全高） |
+
+広い方の下帯に、左寄せ（`left: 72px` / `bottom: 48px`）で3ブロックを積む。
+
+| 要素 | サイズ | ウェイト | 位置 |
+|---|---|---|---|
+| 見出し「手で繰り返している工程を、1本の線に置き換えます。」 | 48px | 700 | y 382–502（2行） |
+| `sawada` | 22px | 700 | y 522–549 |
+| `業務自動化 / Google Workspace / Web制作` | 17px | 400 | y 555–582 |
+
+見出しが主役、`sawada` 以下は署名の扱いにする（サイズ比 2.2倍）。色はすべて `--ink`。
+
+見出しの改行はサイトと同じ作りにする。節を `display: block` で2行に固定し、文節を `white-space: nowrap` にして、収まらない場合でも文節の切れ目でしか折れないようにする。
+
+書体はサイトと同じ woff2 を data URI で埋める。生成時に Google Fonts へ出ないので、いつ流し直しても同じ結果になる。
+
+**形式は PNG。** WebP は X / LINE / Facebook の対応が不安定なため。
+
+`tools/capture.mjs` は書き出す前に検証し、次のいずれかに当たると**画像を出さずに失敗する**。コピーやサイズを変えて流し直したとき、壊れたまま公開されるのを防ぐため。
+
+- 文字が図に重なる（現状の空きは21px、下マージン48px）
+- 見出しが3行を超える（現状2行）
+- 見出しが文節の途中で改行される
 
 ### 検証項目
 
@@ -361,5 +423,9 @@ figure要素で大きめに。カードにしない。
 
 ### 残る作業
 
-- [ ] デモ2サイトのスクリーンショット撮影（1440px幅・ファーストビュー、WebP変換）
-- [ ] OG画像の作成（1200×630）
+- [x] デモ2サイトのスクリーンショット撮影（1440px幅・ファーストビュー、WebP変換）
+      → `node tools/capture.mjs demos` で生成。`assets/images/demo-crosstech.webp` / `demo-studio-core.webp`
+- [x] OG画像の作成（1200×630）
+      → `node tools/capture.mjs og` で生成。下地は `assets/og-bg.png`。設計は §3「OG画像」を参照
+
+いまのところ手作業で用意しなければならないものは無い。素材を作り直したくなったら `tools/capture.mjs` を流す。
