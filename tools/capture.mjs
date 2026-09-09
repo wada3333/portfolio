@@ -148,7 +148,7 @@ async function toWebp(send, pngPath, quality) {
  * x 328-1151 / y 113-362。空いているのは下側 y 362-630（全幅268px）と
  * 左側 x 0-328 なので、下帯の左寄せに積む。
  *
- * 階層は 見出し48px(700) > sawada 22px(700) > 役割行 17px(400)。sawada 以下は
+ * 階層は 見出し48px(700) > wada3333 22px(700) > 役割行 17px(400)。wada3333 以下は
  * 署名の扱いにして、見出しが主役になるようにしている。
  *
  * 見出しの改行はサイトと同じ作りにする。節を display:block で2行に固定し、
@@ -184,7 +184,7 @@ body{width:1200px;height:630px;background:var(--paper);color:var(--ink);position
 <img class="bg" src="${bg}" alt="">
 <div class="txt">
   <p class="head"><span class="cl"><span class="u">手で繰り返している</span><span class="u">工程を、</span></span><span class="cl"><span class="u">1本の線に</span><span class="u">置き換えます。</span></span></p>
-  <p class="name">sawada</p>
+  <p class="name">wada3333</p>
   <p class="role">業務自動化 / Google Workspace / Web制作</p>
 </div>
 </body></html>`;
@@ -249,7 +249,7 @@ try {
       const gap = m.txt.top - ink.out.maxY;
       console.log(`  見出し ${m.lines.length}行: ${m.lines.join(' / ')}${m.split ? '  ⚠ 文節が途中で割れた' : ''}`);
       console.log(`  文字ブロック y ${m.txt.top}-${m.txt.bottom} / x ${m.txt.left}-${m.txt.right}`);
-      console.log(`  見出し y ${m.head.top}-${m.head.bottom} / sawada y ${m.name.top}-${m.name.bottom} / 役割行 y ${m.role.top}-${m.role.bottom}`);
+      console.log(`  見出し y ${m.head.top}-${m.head.bottom} / wada3333 y ${m.name.top}-${m.name.bottom} / 役割行 y ${m.role.top}-${m.role.bottom}`);
       console.log(`  図の下端(${ink.out.maxY}) と文字の上端(${m.txt.top}) の空き: ${gap}px  下マージン ${630 - m.txt.bottom}px`);
       if (gap <= 0) throw new Error(`文字が図に重なっている（空き ${gap}px）`);
       if (m.lines.length > 3) throw new Error(`見出しが ${m.lines.length} 行になった（3行以内にすること）`);
