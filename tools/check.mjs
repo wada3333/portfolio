@@ -383,6 +383,26 @@ try {
     record(g.hint.shown && g.hint.text.includes('ここに処理のログが流れます') && !g2,
       'GAS実行デモ: 実行前のログ枠に案内文が出ていて、実行を始めると消える', `実行前 ${g.hint.shown ? '表示' : '非表示'}「${g.hint.text}」→ 実行中 ${g2 ? '表示' : '非表示'}`);
 
+    // 実績カードのメタ情報（媒体 | 依頼主 | 評価）: 全部1行か、全部縦積み（縦積みでは区切り線なし）。途中だけ折り返さない
+    const metaBad = [];
+    for (const w of [320, 360, 390, 480, 600, 768, 1280]) {
+      await load(w, 900);
+      const bad = JSON.parse(await evaluate(`JSON.stringify([...document.querySelectorAll('.case__meta')].map((m, i) => {
+        const kids = [...m.children];
+        const tops = kids.map(k => Math.round(k.getBoundingClientRect().top));
+        const rows = new Set(tops.map(t => Math.round(t / 6))).size;
+        const stacked = rows === kids.length;
+        const oneRow = rows === 1;
+        const separators = kids.filter(k => !k.classList.contains('chip') && parseFloat(getComputedStyle(k).borderRightWidth) > 0).length;
+        const split = kids.some(k => k.getClientRects().length > 1);
+        const ok = !split && (oneRow || (stacked && separators === 0));
+        return ok ? '' : '実績' + (i + 1) + '(行' + rows + '/区切り' + separators + ')';
+      }).filter(Boolean))`));
+      for (const b of bad) metaBad.push(`${w}px:${b}`);
+    }
+    record(metaBad.length === 0, '実績カードのメタ情報が、全部1行か縦積み（区切り線なし）のどちらかで、途中だけ折り返さない（320〜1280px）',
+      metaBad.length ? '崩れ: ' + metaBad.join(', ') : '5件 × 7つの幅で検査');
+
     // デモ名の「（架空…）」が途中で切れない（PC・スマホ・最小幅）
     const broken = [];
     for (const [w, h] of [[1280, 900], [390, 844], [320, 700]]) {
