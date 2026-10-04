@@ -274,6 +274,7 @@ html.js .static-only{display:none}
 .tbl th,.tbl td{padding:.4rem .6rem;border:1px solid color-mix(in srgb,var(--line) 35%,var(--paper));text-align:left;vertical-align:top}
 .tbl thead th,.tbl tfoot th,.tbl tfoot td{background:var(--paper-deep)}
 .tbl td.num,.tbl th.num{text-align:right;white-space:nowrap}
+.list td:last-child{white-space:nowrap}
 .tbl tr.is-doomed td{opacity:.55;text-decoration:line-through}
 .tbl td.is-changed{box-shadow:inset 3px 0 0 var(--terminal);background:color-mix(in srgb,var(--terminal) 16%,transparent)}
 .demo-actions{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.9rem}
@@ -377,6 +378,8 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
   .btn{flex:1 1 100%}
   .btns{width:100%}
   .demo{padding:.9rem .85rem 1.1rem}
+  .tbl table{font-size:.8125rem}
+  .tbl th,.tbl td{padding:.35rem .4rem}
 }
 @media (max-width:34.99em){
   .wire-before{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -557,25 +560,25 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
             <span hidden data-msg="reset">最初の状態に戻しました。</span>
           </p>
           <div class="tbl">
-            <table class="list-live">
+            <table class="list list-live">
               <caption><span class="static-only">整形前の</span>店舗リスト（10行）</caption>
               <thead><tr><th scope="col">店名</th><th scope="col">区分</th><th scope="col">電話番号</th></tr></thead>
               <tbody>
                 <tr><td data-fixed="株式会社みどり薬局">（株）みどり薬局</td><td>薬局</td><td>03-0000-0001</td></tr>
                 <tr><td>株式会社みどり薬局</td><td>薬局</td><td>03-0000-0001</td></tr>
                 <tr><td>星読みサロン ルナ</td><td>占い</td><td>03-0000-0002</td></tr>
-                <tr><td>星読みサロン ルナ</td><td>占い</td><td data-fixed="03-0000-0002">０３－００００－０００２</td></tr>
+                <tr><td>星読みサロン ルナ</td><td>占い</td><td data-fixed="03-0000-0002">０３-００００-０００２</td></tr>
                 <tr><td>ほぐし処 やすらぎ</td><td>マッサージ</td><td>03-0000-0003</td></tr>
-                <tr><td data-fixed="株式会社ひなた化粧品">（株）ひなた化粧品</td><td>化粧品</td><td data-fixed="03-0000-0004">０３－００００－０００４</td></tr>
+                <tr><td data-fixed="株式会社ひなた化粧品">（株）ひなた化粧品</td><td>化粧品</td><td data-fixed="03-0000-0004">０３-００００-０００４</td></tr>
                 <tr><td>株式会社あおぞら雑貨</td><td>雑貨</td><td>03-0000-0005</td></tr>
                 <tr><td>ほぐし処 やすらぎ</td><td>マッサージ</td><td>03-0000-0003</td></tr>
                 <tr><td data-fixed="株式会社さくら調剤">（株）さくら調剤</td><td>薬局</td><td>03-0000-0006</td></tr>
-                <tr><td>美容サロン コスモス</td><td>美容</td><td data-fixed="03-0000-0007">０３－００００－０００７</td></tr>
+                <tr><td>美容サロン コスモス</td><td>美容</td><td data-fixed="03-0000-0007">０３-００００-０００７</td></tr>
               </tbody>
             </table>
           </div>
           <div class="tbl static-only">
-            <table>
+            <table class="list">
               <caption>整形後の店舗リスト（表記をそろえ、重複を消した7行）</caption>
               <thead><tr><th scope="col">店名</th><th scope="col">区分</th><th scope="col">電話番号</th></tr></thead>
               <tbody>
@@ -623,7 +626,7 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
           </p>
           <div class="tbl">
             <table class="sheet">
-              <caption>月ごとの集計（単位: 円）</caption>
+              <caption>月ごとの集計</caption>
               <thead><tr><th scope="col">月</th><th scope="col" class="num">収入</th><th scope="col" class="num">経費</th><th scope="col" class="num">収支</th></tr></thead>
               <tbody>
                 <tr data-m="1" hidden><th scope="row">1月</th><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>

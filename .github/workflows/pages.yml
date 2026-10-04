@@ -1,0 +1,51 @@
+# GitHub Pages へ、サイトに必要なファイルだけを配信する。
+# リポジトリの Settings -> Pages -> Source を「GitHub Actions」にしたときだけ有効になる。
+# main への push で動く（v2 などのブランチでは動かない）。
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 公開するファイルだけを _site に集める（許可リストは tools/make-site.mjs）
+        run: node tools/make-site.mjs _site
+
+      - name: 公開してはいけないものが入っていないことを確かめる
+        run: |
+          test -f _site/index.html
+          for p in portfolio-lp-spec.md docs tools .github assets/og-bg.png assets/fonts/charset.txt; do
+            if [ -e "_site/$p" ]; then
+              echo "公開してはいけないものが入っている: $p"
+              exit 1
+            fi
+          done
+          echo "公開するファイル:"
+          find _site -type f | sort
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
