@@ -7,10 +7,11 @@
  * 横スクロール / 結線図の縦積み / prefers-reduced-motion / キーボード到達性 /
  * コントラスト比を、実ブラウザ上で確認して結果を出す。
  */
-import { spawn } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { spawn, execFileSync } from 'node:child_process';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const BASE = process.argv[2] || 'http://127.0.0.1:8130/';
 const CHROME = process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
@@ -301,12 +302,45 @@ try {
     js.length ? '検出: ' + js.join(', ') : '<script>・イベントハンドラ・javascript: のいずれも無し');
 
   // --- 6. 出してはいけない情報 ----------------------------------------------
-  const text = await evaluate('document.body.innerText');
-  const banned = ['依頼番号'];
-  const hits = banned.filter((w) => text.includes(w));
-  record(hits.length === 0,
-    '勤務先・実クライアントが特定されうる記述が本文に無い',
-    hits.length ? '検出: ' + hits.join(', ') : `${banned.length}語すべて不検出`);
+  // 語の一覧は公開しない。tools/banned-words.local.txt（.gitignore 済み）から読み、
+  // 無いときはスキップする。このファイルには語を1つも書かないこと。
+  const bannedFile = join(dirname(fileURLToPath(import.meta.url)), 'banned-words.local.txt');
+  if (!existsSync(bannedFile)) {
+    console.log('SKIP 本業に関わる語の検査 — tools/banned-words.local.txt が無いため飛ばした');
+  } else {
+    const lines = readFileSync(bannedFile, 'utf8').split(/\r?\n/).map((w) => w.trim())
+      .filter((w) => w && !w.startsWith('#'));
+    const split = lines.indexOf('[page]');
+    const everywhere = split < 0 ? lines : lines.slice(0, split);
+    const pageOnly = split < 0 ? [] : lines.slice(split + 1);
+    const banned = [...everywhere, ...pageOnly];
+    // 画面に出た文字だけでなく、HTML・JS・属性値・コメントまで含めた配信ファイル全体を見る
+    const pages = [source];
+    const assetRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
+    const jsFiles = (source.match(/src="([^"]+\.js)"/g) || []).map((m) => m.slice(5, -1));
+    for (const f of jsFiles) {
+      try { pages.push(readFileSync(join(assetRoot, f), 'utf8')); } catch { /* 無ければ飛ばす */ }
+    }
+    const shown = await evaluate('document.documentElement.textContent');
+    const all = pages.join('\n') + '\n' + shown;
+    const hits = banned.filter((w) => all.includes(w));
+    record(hits.length === 0,
+      '勤務先・実クライアントが特定されうる記述が配信ファイルに無い',
+      hits.length ? `検出 ${hits.length} 語（語そのものは表示しない）` : `${banned.length}語すべて不検出（HTML・JS・表示テキスト）`);
+
+    // 公開リポジトリに入るファイル全体も見る（仕様書・ツール・コメントに紛れ込むのを防ぐ）
+    const tracked = execFileSync('git', ['ls-files', '-z'], { cwd: assetRoot, encoding: 'utf8' })
+      .split('\0').filter((p) => p && !/\.(png|webp|woff2|svg|mp4|ico)$/i.test(p));
+    const leaked = [];
+    for (const p of tracked) {
+      let body = '';
+      try { body = readFileSync(join(assetRoot, p), 'utf8'); } catch { continue; }
+      if (everywhere.some((w) => body.includes(w))) leaked.push(p);
+    }
+    record(leaked.length === 0,
+      '公開リポジトリのファイル全体に、本業に関わる語が無い',
+      leaked.length ? '検出したファイル: ' + leaked.join(', ') : `追跡中のテキスト ${tracked.length} ファイルを検査`);
+  }
 
   // --- 7. 見出し階層 --------------------------------------------------------
   const heads = await evaluate(`[...document.querySelectorAll('h1,h2,h3,h4,h5,h6')].map(h => +h.tagName[1])`);
