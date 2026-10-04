@@ -646,8 +646,13 @@ try {
     const b = JSON.parse(blank);
     record(b.bad === 0, '別タブで開くリンクに rel="noopener noreferrer" が付いている', `${b.n}本を検査`);
 
-    const todo = JSON.parse(await evaluate(`JSON.stringify([...document.querySelectorAll('[data-todo]')].map(el => el.tagName.toLowerCase() + (el.hidden ? '(hidden)' : '')))`));
-    record(todo.length === 2 && todo.includes('li(hidden)'), '「要記入」が残っているのは請求書PDFのパッケージ（URL）だけで、そのカードは出ていない', `要記入: ${todo.join(', ')}`);
+    const todo = JSON.parse(await evaluate(`JSON.stringify({ marks: [...document.querySelectorAll('[data-todo]')].map(el => (el.closest('#pkg-denchoho') ? 'denchoho' : 'other:' + el.tagName.toLowerCase())), cardHidden: document.getElementById('pkg-denchoho').hidden, href: document.querySelector('#pkg-denchoho a').getAttribute('href') })`));
+    // 「要記入」が残るのは請求書PDFのパッケージ（URL）だけ。残っている間はカードを出さない。URL を入れて印を外したら、カードを出してよい
+    const stray = todo.marks.filter((m) => m !== 'denchoho');
+    const open = todo.marks.length > 0;
+    record(stray.length === 0 && (!open || (todo.cardHidden && todo.href === '#')) && (open || (!todo.cardHidden && /^https:\/\/www\.lancers\.jp\/menu\/detail\/\d+$/.test(todo.href))),
+      '「要記入」が残るのは請求書PDFのパッケージのURLだけで、残っている間そのカードは出ない（解消したらURLが入ってカードが出る）',
+      open ? `要記入あり（請求書PDFのパッケージのURL）。カードは非表示` : `解消済み: ${todo.href}`);
   }
 
   // =========================================================================
