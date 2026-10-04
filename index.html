@@ -284,6 +284,9 @@ html.js .static-only{display:none}
 .gas-log .t{flex:none;font-weight:700}
 html.js .gas-log li,html.js .gas-row,html.js .gas-ng{display:none}
 html.js .gas-log li.on{display:flex}
+.gas-hint{color:var(--mute)}
+html:not(.js) .gas-hint{display:none}
+html.js .gas-log li.gas-hint{display:block}
 html.js .gas-row.on{display:table-row}
 html.js .gas-ng.on{display:table-row}
 .gas-done{margin-top:.7rem;font-size:var(--fs-small);line-height:1.7;font-weight:700}
@@ -485,7 +488,7 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
         <dl>
           <dt>課題</dt><dd>家賃と経費を、確定申告に使える形で管理したい</dd>
           <dt>対応</dt><dd>家賃・経費を1行ずつ入力するだけで、物件別・月別・年間の集計と減価償却を自動で計算する Excel を作成。物件3件と、白色・青色の両方の申告に対応し、使い方のシートを分けて納品した。納品後の修正依頼（科目プルダウンの並び替え、見出しの色の変更）にも対応</dd>
-          <dt>結果</dt><dd>評価5.0</dd>
+          <dt>結果</dt><dd>評価5.0（全項目満点）</dd>
         </dl>
         <p class="note">※税務相談や申告書の作成代行は行っていません。確定申告に向けた記帳・集計のしくみ（Excel管理表など）づくりを担当します。</p>
       </article>
@@ -662,6 +665,7 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
           <div class="gas">
             <div>
               <ol class="gas-log" aria-label="実行ログ">
+                <li class="gas-hint">「実行」を押すと、ここに処理のログが流れます。</li>
                 <li data-step="0"><span class="t">21:00:01</span><span>実行を開始しました</span></li>
                 <li data-step="1"><span class="t">21:00:02</span><span>未処理のメール6件を取得しました</span></li>
                 <li data-step="2" data-row="0"><span class="t">21:00:03</span><span>1件目を記録しました</span></li>
@@ -724,7 +728,7 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
         <article class="site">
           <img src="assets/images/demo-crosstech.webp" width="1440" height="900" loading="lazy" decoding="async" alt="CROSSTECH ARCHITECTS のトップページ。暗い執務室の写真の上に「バックオフィスを、次世代のエンジンへ。」という見出しと、無料シミュレーション・相談のボタンが置かれている。">
           <div>
-            <h4>株式会社クロステック・アーキテクツ（架空）</h4>
+            <h4>株式会社クロステック・アーキテクツ<span class="nw">（架空）</span></h4>
             <p>中小企業向けの業務自動化コンサルを想定した BtoB サイト</p>
             <dl><dt>見どころ</dt><dd>導入効果を試算するスライダー／GASと連携したフォーム／ダークモード</dd></dl>
             <p><a href="https://wada3333.github.io/crosstech-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/crosstech-lp/</a></p>
@@ -733,7 +737,7 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
         <article class="site">
           <img src="assets/images/demo-studio-core.webp" width="1440" height="900" loading="lazy" decoding="async" alt="STUDIO CORE のトップページ。明るい個室スタジオの写真の上に「続かなかった人が、続けている。」という見出しと、無料カウンセリングを予約するボタンが置かれている。">
           <div>
-            <h4>STUDIO CORE（架空のパーソナルジム）</h4>
+            <h4>STUDIO CORE<span class="nw">（架空のパーソナルジム）</span></h4>
             <p>申し込みまでの流れを重視した BtoC 向けLP</p>
             <dl><dt>見どころ</dt><dd>予約フォームの空き枠表示／表示速度／計測イベントの設計</dd></dl>
             <p><a href="https://wada3333.github.io/studio-core-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/studio-core-lp/</a></p>
@@ -742,7 +746,7 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
         <article class="site">
           <img src="assets/images/demo-bloom.webp" width="1440" height="900" loading="lazy" decoding="async" alt="BLOOM（架空の美容室）のトップページ。レンガの壁の店内の写真の上に「あなたらしさが、咲く場所。」という見出しと、予約するボタンが置かれている。">
           <div>
-            <h4>BLOOM（架空の美容室）</h4>
+            <h4>BLOOM<span class="nw">（架空の美容室）</span></h4>
             <p>予約までを4ステップにまとめた店舗LP</p>
             <dl><dt>見どころ</dt><dd>4ステップ予約／Before・After スライダー</dd></dl>
             <p><a href="https://wada3333.github.io/bloom-salon-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/bloom-salon-lp/</a></p>
@@ -797,11 +801,11 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
         <p class="price">15,000円〜</p>
         <a class="btn btn--sub" href="https://www.lancers.jp/menu/detail/1336560" target="_blank" rel="noopener noreferrer">詳細を見る</a>
       </li>
-      <li class="pkg" id="pkg-denchoho" hidden data-todo="要記入">
+      <li class="pkg" id="pkg-denchoho">
         <img src="assets/images/pkg-denchoho.webp" width="800" height="450" loading="lazy" decoding="async" alt="請求書PDFの名前付け・フォルダ分けを自動化するパッケージの表紙。日付・取引先・金額の名前に自動で変更し、年月・取引先のフォルダへ振り分け、二重保存を検知する。15,000円〜、チャットのみ。">
-        <h3>請求書PDFを電帳法対応の名前に自動リネーム・整理</h3>
+        <h3>簿記2級SEが請求書PDFを電帳法対応の名前に自動リネーム・整理します</h3>
         <p class="price">15,000円〜</p>
-        <a class="btn btn--sub" href="#" target="_blank" rel="noopener noreferrer" data-todo="要記入">詳細を見る</a>
+        <a class="btn btn--sub" href="https://www.lancers.jp/menu/detail/1335015" target="_blank" rel="noopener noreferrer">詳細を見る</a>
       </li>
     </ul>
   </section>
@@ -809,7 +813,7 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
   <!-- 6 頼めるか診断 -->
   <section class="sec" id="check">
     <h2>頼めるか診断</h2>
-    <p class="sec-lead">3つ答えると、受けられるかどうかと、どこから頼めばいいかが出ます。</p>
+    <p class="sec-lead">2つ答えると、受けられるかどうかと、どこから頼めばいいかが出ます。</p>
 
     <div class="diag-live js-only">
       <fieldset class="q" data-q="q1">

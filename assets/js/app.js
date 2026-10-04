@@ -191,7 +191,8 @@ function initGas() {
   const demo = $('#demo-gas');
   if (!demo) return;
   const run = $('[data-act="run"]', demo);
-  const steps = $$('.gas-log li', demo);
+  const steps = $$('.gas-log li[data-step]', demo);
+  const hint = $('.gas-hint', demo);
   const rows = $$('.gas-row', demo);
   const ng = $('.gas-ng', demo);
   const done = $('[data-done]', demo);
@@ -204,6 +205,7 @@ function initGas() {
     running = true;
     run.disabled = true;
     demo.setAttribute('aria-busy', 'true');
+    hint.hidden = true;
     for (const el of [...steps, ...rows, ng, done]) el.classList.remove('on');
     for (const step of steps) {
       step.classList.add('on');

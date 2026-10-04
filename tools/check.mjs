@@ -364,6 +364,37 @@ try {
   }
 
   // =========================================================================
+  // 10b. 文言と表示の細部（実際の数と合っているか、途中で切れていないか）
+  // =========================================================================
+  {
+    // 診断の説明文の「N つ答えると」が、いつも出ている質問の数と合っている
+    await load(1280, 900);
+    const intro = JSON.parse(await evaluate(`JSON.stringify({
+      text: document.querySelector('#check .sec-lead').textContent,
+      always: [...document.querySelectorAll('.diag-live fieldset.q')].filter(f => !f.hidden).length })`));
+    const said = (intro.text.match(/^(\d)つ答えると/) || [])[1];
+    record(Number(said) === intro.always, '診断の説明文の「N つ答えると」が、最初から出ている質問の数と合っている', `説明文 ${said || '?'}つ / 質問 ${intro.always}問（問3は条件つきで出る）`);
+
+    // GAS実行デモ: 実行前は案内文が出ていて、実行すると消える。案内文は読める濃さ
+    const g = JSON.parse(await evaluate(`JSON.stringify({ hint: (() => { const h = document.querySelector('.gas-hint'); const r = h.getBoundingClientRect(); return { shown: r.width > 0, text: h.textContent }; })() })`));
+    await evaluate(`document.querySelector('#demo-gas [data-act=run]').click(); 1`);
+    await sleep(600);
+    const g2 = await evaluate(`document.querySelector('.gas-hint').getBoundingClientRect().width > 0`);
+    record(g.hint.shown && g.hint.text.includes('ここに処理のログが流れます') && !g2,
+      'GAS実行デモ: 実行前のログ枠に案内文が出ていて、実行を始めると消える', `実行前 ${g.hint.shown ? '表示' : '非表示'}「${g.hint.text}」→ 実行中 ${g2 ? '表示' : '非表示'}`);
+
+    // デモ名の「（架空…）」が途中で切れない（PC・スマホ・最小幅）
+    const broken = [];
+    for (const [w, h] of [[1280, 900], [390, 844], [320, 700]]) {
+      await load(w, h);
+      const bad = JSON.parse(await evaluate(`JSON.stringify([...document.querySelectorAll('.nw')].filter(el => el.getClientRects().length > 1).map(el => el.textContent))`));
+      for (const t of bad) broken.push(`${w}px:${t}`);
+    }
+    record(broken.length === 0, '「（架空…）」や「（構築・PL歴8年）」など、まとまりで読ませる語が途中で折り返されない（1280 / 390 / 320px）',
+      broken.length ? '折り返された: ' + broken.join(', ') : 'nowrap の語をすべて検査');
+  }
+
+  // =========================================================================
   // 11. 頼めるか診断（分岐）と、?from= による出し分け
   // =========================================================================
   const diagRun = async (answers) => JSON.parse(await evaluate(`(() => {
@@ -388,7 +419,7 @@ try {
       ['自動化(LINE) → パッケージ', [['q1', 'auto'], ['q2', 'chat'], ['q3', 'line']], 'pkg', 'LINEに送るだけ'],
       ['自動化(転記集計) → パッケージ', [['q1', 'auto'], ['q2', 'chat'], ['q3', 'gas']], 'pkg', 'スプレッドシートの転記'],
       ['自動化(入金消込) → パッケージ', [['q1', 'auto'], ['q2', 'chat'], ['q3', 'recon']], 'pkg', '入金消込'],
-      ['自動化(請求書PDF・URL未設定) → 相談', [['q1', 'auto'], ['q2', 'chat'], ['q3', 'denchoho']], 'consult', ''],
+      ['自動化(請求書PDF) → パッケージ', [['q1', 'auto'], ['q2', 'chat'], ['q3', 'denchoho']], 'pkg', '簿記2級SEが請求書PDF'],
       ['自動化(どれにも当てはまらない) → 相談', [['q1', 'auto'], ['q2', 'chat'], ['q3', 'none']], 'consult', ''],
       ['税務＋チャット → 条件が合いません(B)', [['q1', 'tax'], ['q2', 'chat']], 'ng-b', ''],
       ['リスト＋通話 → 条件が合いません(A)', [['q1', 'list'], ['q2', 'call']], 'ng-a', ''],
@@ -594,7 +625,7 @@ try {
       ['図の説明（業務を選ぶ）', '自動化前（手作業の6工程）'],
       ['評価の数字', 'クラウドワークス評価'],
       ['稼働条件', '平日は21時以降と、土日祝に対応しています'],
-      ['実績1', '家賃・経費を1行ずつ入力するだけで'], ['実績2', '次回も相談したいと思います'],
+      ['実績1', '家賃・経費を1行ずつ入力するだけで'], ['実績1の結果', '評価5.0（全項目満点）'], ['実績2', '次回も相談したいと思います'],
       ['実績3', '急な依頼を要望通りにやって頂きありがとうございました'], ['実績4', '本番まで伴走までして頂き本当にありがとうございました'],
       ['実績5', 'とても丁寧に対応いただきました'],
       ['税務の注記', '税務相談や申告書の作成代行は行っていません'],
@@ -607,12 +638,12 @@ try {
       ['進め方', '引き渡し'], ['資格', 'Microsoft Azure Fundamentals'], ['依頼先（LC）', 'ランサーズで相談する'], ['依頼先（CW）', 'クラウドワークスで相談する']
     ];
     const missing = must.filter(([, t]) => !text.includes(squash(t))).map(([n]) => n);
-    const hiddenOk = !text.includes(squash("請求書PDFを電帳法対応の名前に自動リネーム・整理")); // URL 未設定のカードは出さない
+    const hiddenOk = text.includes(squash('簿記2級SEが請求書PDFを電帳法対応の名前に自動リネーム・整理します')); // 4件目のパッケージも出ている
     const toggle = await evaluate(`getComputedStyle(document.querySelector('.theme-toggle')).display`);
     const live = await evaluate(`getComputedStyle(document.querySelector('.diag-live')).display`);
     record(missing.length === 0 && hiddenOk && toggle === 'none' && live === 'none',
       'JavaScript を止めても全セクションの文言が読める（操作部品だけが隠れる）',
-      missing.length ? '読めない: ' + missing.join(', ') : `${must.length}か所の文言を確認 / 切り替えボタン・診断の入力欄は非表示 / URL未設定のカードは出ない`);
+      missing.length ? '読めない: ' + missing.join(', ') : `${must.length}か所の文言を確認 / 切り替えボタン・診断の入力欄は非表示 / 4件目のパッケージも出る`);
   }
 
   // =========================================================================
