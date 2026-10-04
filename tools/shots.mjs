@@ -1,11 +1,13 @@
 /**
- * 自己レビュー用のスクリーンショット（外部依存ゼロ）
+ * 自己レビュー用のスクリーンショット（外部依存ゼロ。Chrome を CDP で直接操作する）
  * ---------------------------------------------------------------------------
  *   node tools/serve.mjs 8130        # 別ターミナルで起動しておく
  *   node tools/shots.mjs [出力先ディレクトリ] [URL]
  *
- * 375 / 768 / 1440px の3幅で、ページを上から1画面ずつ撮って WebP で書き出す。
- * CDP の Page.captureScreenshot に format:'webp' を渡すので、受信が軽い。
+ * PC（1280px）とスマホ（390px）を、ライト・ダークの両方で撮る。
+ * ページを上から1画面ずつ撮って WebP で書き出す。ファイル名: {pc|mobile}-{light|dark}/NN.webp
+ * ダークは Emulation.setEmulatedMedia で prefers-color-scheme を切り替える
+ * （ページの保存値は使わない。毎回新しいプロファイルで起動するため）。
  */
 import { spawn } from 'node:child_process';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -14,14 +16,17 @@ import { join } from 'node:path';
 
 const OUT = process.argv[2] || join(tmpdir(), 'pf-shots');
 const BASE = process.argv[3] || 'http://127.0.0.1:8130/';
+const ONLY = process.env.SHOTS_ONLY; // 例: "mobile-dark"
 const CHROME = process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const PORT = 9342;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/** [幅, 画面高さ] */
-const WIDTHS = [[375, 812], [768, 1024], [1440, 900]];
+const VIEWPORTS = [
+  { name: 'pc', width: 1280, height: 900, mobile: false },
+  { name: 'mobile', width: 390, height: 844, mobile: true }
+];
+const THEMES = ['light', 'dark'];
 
-mkdirSync(OUT, { recursive: true });
 const profile = mkdtempSync(join(tmpdir(), 'pf-shots-'));
 const chrome = spawn(CHROME, [
   '--headless', `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`,
@@ -39,7 +44,6 @@ try {
     ws.addEventListener('open', resolve, { once: true });
     ws.addEventListener('error', reject, { once: true });
   });
-
   let id = 0;
   const pending = new Map();
   ws.addEventListener('message', (ev) => {
@@ -60,34 +64,37 @@ try {
   await send('Page.enable');
   await send('Runtime.enable');
 
-  for (const [width, height] of WIDTHS) {
-    await send('Emulation.setDeviceMetricsOverride', {
-      width, height, deviceScaleFactor: 1, mobile: width < 768
-    });
-    await send('Page.navigate', { url: BASE });
-    await sleep(2200);
-    await evaluate('document.fonts.ready.then(() => 1)');
-    await sleep(400);
+  for (const vp of VIEWPORTS) {
+    for (const theme of THEMES) {
+      const tag = `${vp.name}-${theme}`;
+      if (ONLY && ONLY !== tag) continue;
+      const dir = join(OUT, tag);
+      rmSync(dir, { recursive: true, force: true });
+      mkdirSync(dir, { recursive: true });
 
-    const pageH = await evaluate('document.documentElement.scrollHeight');
-    const overflow = await evaluate(
-      '({sw: document.documentElement.scrollWidth, iw: window.innerWidth})'
-    );
-    console.log(`${width}px: 全高 ${pageH}px / scrollWidth ${overflow.sw} vs innerWidth ${overflow.iw}` +
-      (overflow.sw > overflow.iw ? '  ← 横スクロールあり' : '  横スクロールなし'));
+      await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: theme }] });
+      await send('Emulation.setDeviceMetricsOverride', {
+        width: vp.width, height: vp.height, deviceScaleFactor: 1, mobile: vp.mobile
+      });
+      await send('Page.navigate', { url: BASE });
+      await sleep(2200);
+      await evaluate('document.fonts.ready.then(() => 1)');
+      await sleep(400);
 
-    const screens = Math.ceil(pageH / height);
-    for (let s = 0; s < screens; s++) {
-      const y = s * height;
-      await evaluate(`scrollTo(0, ${y}); 1`);
-      await sleep(250);
-      const shot = await send('Page.captureScreenshot', { format: 'webp', quality: 82 });
-      const name = `w${width}-${String(s + 1).padStart(2, '0')}.webp`;
-      writeFileSync(join(OUT, name), Buffer.from(shot.result.data, 'base64'));
+      const pageH = await evaluate('document.documentElement.scrollHeight');
+      const overflow = await evaluate('({sw: document.documentElement.scrollWidth, iw: window.innerWidth})');
+      const shown = await evaluate("document.documentElement.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')");
+      const screens = Math.ceil(pageH / vp.height);
+      for (let s = 0; s < screens; s++) {
+        await evaluate(`scrollTo(0, ${s * vp.height}); 1`);
+        await sleep(450); // 遅延読み込みの画像と、導線の色の変化を待つ
+        const shot = await send('Page.captureScreenshot', { format: 'webp', quality: 80 });
+        writeFileSync(join(dir, `${String(s + 1).padStart(2, '0')}.webp`), Buffer.from(shot.result.data, 'base64'));
+      }
+      console.log(`${tag.padEnd(13)} 全高 ${String(pageH).padStart(5)}px / ${screens}枚 / 表示テーマ ${shown} / ` +
+        (overflow.sw > overflow.iw ? `横スクロールあり(${overflow.sw}>${overflow.iw})` : '横スクロールなし'));
     }
-    console.log(`  -> ${screens}枚`);
   }
-
   ws.close();
   console.log('出力先: ' + OUT);
 } finally {

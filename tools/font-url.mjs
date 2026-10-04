@@ -53,7 +53,18 @@ try {
 
   const res = await send('Runtime.evaluate', {
     expression: `(() => {
-      let s = document.body.innerText;
+      // innerText は画面に出ている文字しか返さない。閉じたタブ・診断の結果・デモの文言など
+      // 「隠れているが、あとで出る文字」を取りこぼすので、DOM の文字を全部たどる。
+      let s = document.title;
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode: (n) => /^(SCRIPT|STYLE|NOSCRIPT)$/.test(n.parentElement.tagName)
+          ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
+      });
+      while (walker.nextNode()) s += walker.currentNode.textContent;
+      // 属性に入っている文字（画像の代替テキスト、読み上げ用の名前、デモの整形後の値）
+      for (const el of document.querySelectorAll('[alt],[aria-label],[title],[placeholder],[data-fixed],[value]')) {
+        for (const a of ['alt', 'aria-label', 'title', 'placeholder', 'data-fixed', 'value']) s += el.getAttribute(a) || '';
+      }
       // ::before / ::after の生成内容（進め方の連番など）も拾う
       for (const el of document.querySelectorAll('*')) {
         for (const p of ['::before', '::after']) {

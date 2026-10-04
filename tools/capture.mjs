@@ -1,7 +1,7 @@
 /**
  * 公開デモのスクリーンショット撮影と OG 画像の生成（外部依存ゼロ）
  * ---------------------------------------------------------------------------
- *   node tools/capture.mjs [demos|og|all]
+ *   node tools/capture.mjs [demos|packages|og|all]
  *
  * 撮影はヘッドレス Chrome の --screenshot に任せ、WebP 変換は同じ Chrome の
  * canvas.toBlob('image/webp') で行う。cwebp / sharp / puppeteer は不要。
@@ -22,7 +22,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 /** [出力名, URL, 幅, 高さ, WebP品質] */
 const DEMOS = [
   ['demo-crosstech.webp', 'https://wada3333.github.io/crosstech-lp/', 1440, 900, 0.82],
-  ['demo-studio-core.webp', 'https://wada3333.github.io/studio-core-lp/', 1440, 900, 0.82]
+  ['demo-studio-core.webp', 'https://wada3333.github.io/studio-core-lp/', 1440, 900, 0.82],
+  ['demo-bloom.webp', 'https://wada3333.github.io/bloom-salon-lp/', 1440, 900, 0.82]
+];
+
+/** ランサーズのパッケージの表紙。元は 1672x940 前後の PNG（1.3MB）なので幅800のWebPに縮める */
+const PKG_DIR = process.env.PKG_DIR || 'C:/Users/USER/Desktop/ランサーズパッケージ';
+const PACKAGES = [
+  ['pkg-line.webp', 'LINE/ChatGPT 画像 2026年9月30日 23_02_27.png'],
+  ['pkg-gas.webp', 'GAS/ChatGPT 画像 2026年9月30日 22_34_47.png'],
+  ['pkg-recon.webp', '経理/ChatGPT 画像 2026年9月30日 22_09_20.png'],
+  ['pkg-denchoho.webp', '電帳法/denchoho_thumbnail_1220x686.png']
 ];
 
 const work = mkdtempSync(join(tmpdir(), 'pf-cap-'));
@@ -36,7 +46,9 @@ function shoot(url, out, width, height) {
     `--user-data-dir=${profile}`,
     `--window-size=${width},${height}`,
     '--force-color-profile=srgb',
-    '--virtual-time-budget=8000',
+    // 出現演出の途中で撮れてしまうサイト用。演出を止めた状態（完成形）で撮る
+    ...(process.env.CAPTURE_REDUCED ? ['--force-prefers-reduced-motion'] : []),
+    `--virtual-time-budget=${process.env.CAPTURE_BUDGET || 8000}`,
     `--screenshot=${out}`,
     url
   ], { stdio: 'ignore', timeout: 120000 });
@@ -117,22 +129,23 @@ async function inkBox(evaluate, pngPath, outW, outH) {
 }
 
 /** PNG を WebP に変換する。data: URI 経由なので canvas は汚染されない */
-async function toWebp(send, pngPath, quality) {
+async function toWebp(send, pngPath, quality, targetWidth) {
   const dataUri = 'data:image/png;base64,' + readFileSync(pngPath).toString('base64');
   const expression = `(async () => {
     const img = new Image();
     img.src = ${JSON.stringify(dataUri)};
     await img.decode();
     const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+    const scale = ${targetWidth ? 'Math.min(1, ' + targetWidth + ' / img.naturalWidth)' : '1'};
+    canvas.width = Math.round(img.naturalWidth * scale); canvas.height = Math.round(img.naturalHeight * scale);
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img, 0, 0);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', ${quality}));
     const buf = new Uint8Array(await blob.arrayBuffer());
     let bin = '';
     for (let i = 0; i < buf.length; i += 8192) bin += String.fromCharCode.apply(null, buf.subarray(i, i + 8192));
-    return JSON.stringify({ size: [img.naturalWidth, img.naturalHeight], data: btoa(bin) });
+    return JSON.stringify({ size: [canvas.width, canvas.height], data: btoa(bin) });
   })()`;
   const res = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
   if (res.result.exceptionDetails) throw new Error(JSON.stringify(res.result.exceptionDetails));
@@ -202,6 +215,11 @@ try {
     }
   }
 
+  if (mode === 'all' || mode === 'packages') {
+    console.log('パッケージの表紙を WebP（幅800）に変換します');
+    for (const [out, rel] of PACKAGES) pngs.push([out, join(PKG_DIR, rel), 0.8, 800]);
+  }
+
   if (mode === 'all' || mode === 'og') {
     console.log('OG画像を生成します（1200x630）');
     // 下地と書体を data URI で埋め込む。相対パスは file:// の一時HTMLから引けないため
@@ -268,8 +286,8 @@ try {
   if (pngs.length) {
     const chrome = await openChrome();
     try {
-      for (const [out, png, q] of pngs) {
-        const r = await toWebp(chrome.send, png, q);
+      for (const [out, png, q, width] of pngs) {
+        const r = await toWebp(chrome.send, png, q, width);
         const buffer = Buffer.from(r.data, 'base64');
         writeFileSync(join(ROOT, 'assets', 'images', out), buffer);
         console.log(`  assets/images/${out}  ${r.size.join('x')}  ${(buffer.length / 1024).toFixed(0)}KB`);

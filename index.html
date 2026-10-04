@@ -1,30 +1,47 @@
 <!doctype html>
-<html lang="ja">
+<html lang="ja" data-channel="both">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>wada3333｜業務自動化 / Google Workspace / Web制作</title>
-<meta name="description" content="手で繰り返している工程を、1本の線に置き換えます。平日夜間と土日で対応しています。やり取りはチャットのみ、通話・訪問は行いません。">
+<title>wada3333｜リスト作成 / 管理表 / 業務の自動化 / LP制作</title>
+<meta name="description" content="手で繰り返している作業を、自動で回る仕組みにします。平日は21時以降と、土日祝に対応しています。やり取りはチャットのみで、通話・訪問は行いません。">
 <link rel="canonical" href="https://wada3333.github.io/portfolio/">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#EDF0F2">
+<meta name="theme-color" content="#EDF0F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1520" media="(prefers-color-scheme: dark)">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="wada3333">
-<meta property="og:title" content="wada3333｜業務自動化 / Google Workspace / Web制作">
-<meta property="og:description" content="手で繰り返している工程を、1本の線に置き換えます。平日夜間と土日で対応しています。やり取りはチャットのみ、通話・訪問は行いません。">
+<meta property="og:title" content="wada3333｜リスト作成 / 管理表 / 業務の自動化 / LP制作">
+<meta property="og:description" content="手で繰り返している作業を、自動で回る仕組みにします。平日は21時以降と、土日祝に対応しています。やり取りはチャットのみで、通話・訪問は行いません。">
 <meta property="og:url" content="https://wada3333.github.io/portfolio/">
-<meta property="og:image" content="https://wada3333.github.io/portfolio/assets/og.png?v=2">
+<meta property="og:image" content="https://wada3333.github.io/portfolio/assets/og.png?v=3">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="wada3333｜業務自動化 / Google Workspace / Web制作">
-<meta name="twitter:description" content="手で繰り返している工程を、1本の線に置き換えます。平日夜間と土日で対応しています。やり取りはチャットのみ、通話・訪問は行いません。">
-<meta name="twitter:image" content="https://wada3333.github.io/portfolio/assets/og.png?v=2">
+<meta name="twitter:title" content="wada3333｜リスト作成 / 管理表 / 業務の自動化 / LP制作">
+<meta name="twitter:description" content="手で繰り返している作業を、自動で回る仕組みにします。平日は21時以降と、土日祝に対応しています。やり取りはチャットのみで、通話・訪問は行いません。">
+<meta name="twitter:image" content="https://wada3333.github.io/portfolio/assets/og.png?v=3">
 
-<!-- 書体は自ドメインから配る。Google Fonts の text= サブセット（このページで使う501字だけ）を
-     assets/fonts/ に取り込んだもの。node tools/font-url.mjs -> node tools/fonts.mjs で再生成する。
-     fonts.googleapis.com -> fonts.gstatic.com と別オリジンを2つ踏むと、モバイルの実効回線では
-     DNS/TLS の往復だけで FCP が 3.0秒（Performance 87）になる。同一オリジンなら往復が要らない。
+<!-- 描画前に決めること: 明るさ（ダークモード）と、どこから来たか（?from=lc / ?from=cw）。
+     描画後に切り替えると、一瞬だけ違う表示が見えてしまうので <head> で済ませる。
+     JS が動かない環境では、ライトまたは OS の設定のまま、導線は「両方」のままになる。 -->
+<script>
+(function () {
+  var d = document.documentElement;
+  d.classList.add('js');
+  try { var t = localStorage.getItem('theme'); if (t === 'dark' || t === 'light') d.setAttribute('data-theme', t); } catch (e) {}
+  var ch = 'both';
+  try {
+    var p = new URLSearchParams(location.search).get('from');
+    if (p === 'lc' || p === 'cw') { ch = p; sessionStorage.setItem('channel', p); }
+    else { var s = sessionStorage.getItem('channel'); if (s === 'lc' || s === 'cw') ch = s; }
+  } catch (e) {}
+  d.setAttribute('data-channel', ch);
+})();
+</script>
+
+<!-- 書体は自ドメインから配る（assets/fonts/）。コピーを変えたら
+     node tools/font-url.mjs -> node tools/fonts.mjs で作り直すこと。
      Inter Tight / Zen Kaku Gothic New はいずれも SIL Open Font License（assets/fonts/OFL.txt）。 -->
 <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/zen-kaku-gothic-new-400.woff2">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/zen-kaku-gothic-new-700.woff2">
@@ -37,11 +54,11 @@
 @font-face{font-family:'Zen Kaku Gothic New';font-style:normal;font-weight:700;font-display:swap;src:url(assets/fonts/zen-kaku-gothic-new-700.woff2) format('woff2')}
 
 /* ===========================================================================
-   トークン（portfolio-lp-spec.md §1）
-   --mute だけ #63707E から #5F6C7A に落としている。#63707E は --paper 上で
-   4.42:1 しかなく、14px のキャプションで WCAG AA（4.5:1）に届かないため。
+   トークン（portfolio-lp-spec.md §2.2）
+   ダークは OS の設定に従い、ヘッダーのボタンで上書きできる。
    =========================================================================== */
 :root{
+  color-scheme:light;
   --ink:#101826;
   --paper:#EDF0F2;
   --paper-deep:#DDE3E8;
@@ -50,6 +67,7 @@
   --mute:#5F6C7A;
 
   --fs-hero:clamp(2rem, 5.2vw, 3.4rem);
+  --fs-stat:clamp(2rem, 4.6vw, 2.75rem);
   --fs-h2:1.75rem;
   --fs-h3:1.25rem;
   --fs-body:1rem;
@@ -61,53 +79,89 @@
   --page:64rem;
   --gutter:clamp(1.25rem, 4vw, 2rem);
   --rail:2.75rem;
+  --rail-x:var(--rail);
   --sec:clamp(3.25rem, 7vw, 5.5rem);
+  --case-gap:clamp(2rem, 4vw, 2.75rem);
+  --dot-y:calc(1.1rem + .9375rem);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ink:#E4E9EF; --paper:#0E1520; --paper-deep:#172131; --line:#7AA7EE; --mute:#9AA7B6;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ink:#E4E9EF; --paper:#0E1520; --paper-deep:#172131; --line:#7AA7EE; --mute:#9AA7B6;
 }
 
 *,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:5.5rem}
 body{
-  margin:0;
-  background:var(--paper);
-  color:var(--ink);
-  font-family:var(--font);
-  font-size:var(--fs-body);
-  font-weight:400;
-  line-height:1.85;
-  font-variant-numeric:tabular-nums;
-  text-underline-offset:.22em;
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--font);font-size:var(--fs-body);font-weight:400;line-height:1.85;
+  font-variant-numeric:tabular-nums;text-underline-offset:.22em;
+  word-break:auto-phrase;overflow-wrap:break-word;
 }
-h1,h2,h3,p,ul,ol,dl,dd,figure,blockquote{margin:0}
+.nw{white-space:nowrap}
+h1,h2,h3,h4,p,ul,ol,dl,dd,figure,fieldset{margin:0}
 ul,ol{padding:0;list-style:none}
 img{display:block;max-width:100%;height:auto}
 a{color:var(--line)}
-h1,h2,h3{font-feature-settings:"palt" 1;font-weight:700;word-break:auto-phrase}
-:focus-visible{outline:2px solid var(--terminal);outline-offset:2px}
-
+h1,h2,h3,h4{font-feature-settings:"palt" 1;font-weight:700;word-break:auto-phrase}
+[hidden]{display:none!important}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--terminal);outline-offset:2px;box-shadow:0 0 0 4px var(--ink)}
+.sr{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
 .skip{position:absolute;left:var(--gutter);top:0;z-index:20;padding:.7rem 1.1rem;background:var(--ink);color:var(--paper);text-decoration:none;transform:translateY(-150%)}
 .skip:focus{transform:translateY(0)}
 
-/* --- ヘッダー（固定） ------------------------------------------------- */
+/* JS が動くときだけ出すもの / 動かないときだけ出すもの */
+html:not(.js) .js-only{display:none}
+html.js .static-only{display:none}
+
+/* --- LC・CW への導線の出し分け（§7）------------------------------------- */
+:root[data-channel="lc"] [data-only="cw"],
+:root[data-channel="cw"] [data-only="lc"],
+:root[data-channel="cw"] [data-hide-for="cw"]{display:none!important}
+
+/* --- ボタン ------------------------------------------------------------ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;min-height:44px;
+  background:var(--ink);color:var(--paper);text-decoration:none;font-weight:700;font-size:.9375rem;line-height:1.5;
+  padding:.5rem 1.4rem;border:0;border-bottom:3px solid var(--terminal);cursor:pointer;
+}
+.btn:hover{opacity:.88}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.55;cursor:default}
+.btn--sub{background:transparent;color:var(--ink);border:1px solid var(--line);border-bottom-width:1px}
+.btn--sub:hover{background:var(--paper-deep);opacity:1}
+.btns{display:flex;flex-wrap:wrap;gap:.75rem}
+
+/* --- ヘッダー（固定）--------------------------------------------------- */
 .head{position:sticky;top:0;z-index:10;background:var(--paper);border-bottom:1px solid var(--paper-deep)}
-.head__in{max-width:var(--page);margin-inline:auto;padding:.7rem var(--gutter);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.head__in{max-width:var(--page);margin-inline:auto;padding:.4rem var(--gutter);display:flex;align-items:center;justify-content:space-between;gap:.75rem;min-height:3.75rem}
 .head__name{display:block;font-size:1.0625rem;font-weight:700;letter-spacing:.04em;line-height:1.3}
 .head__role{display:block;font-size:.75rem;color:var(--mute);line-height:1.5;margin-top:.15rem}
-.head__right{display:flex;align-items:center;gap:clamp(.75rem,3vw,1.5rem);flex:none}
+.head__right{display:flex;align-items:center;gap:clamp(.5rem,2.5vw,1.25rem);flex:none}
 .status{display:inline-flex;align-items:center;gap:.4rem;font-size:var(--fs-small);white-space:nowrap}
-/* ここだけは丸。結線図の「端子」（角のない四角）と、稼働状況のドットを描き分ける */
 .status::before{content:"";width:.55rem;height:.55rem;border-radius:50%;background:var(--terminal)}
-.head__cta{font-size:var(--fs-small);font-weight:700;color:var(--ink);text-decoration:none;white-space:nowrap;padding:.35rem 0;border-bottom:2px solid var(--terminal)}
+.head__cta{display:inline-flex;align-items:center;min-height:44px;font-size:var(--fs-small);font-weight:700;color:var(--ink);text-decoration:none;white-space:nowrap;border-bottom:2px solid var(--terminal)}
 .head__cta:hover{border-bottom-width:3px}
+.theme-toggle{position:relative;width:44px;height:44px;padding:0;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.theme-toggle::before{content:"";position:absolute;left:12px;top:12px;width:18px;height:18px;border:2px solid currentColor;border-radius:50%}
+.theme-toggle::after{content:"";position:absolute;left:21px;top:14px;width:7px;height:14px;background:currentColor;border-radius:0 7px 7px 0}
+.theme-toggle:active{transform:translateY(1px)}
 
 /* --- 導線（左の縦線）と端子 -------------------------------------------- */
 .rail{position:relative;max-width:var(--page);margin-inline:auto;padding-inline:var(--gutter)}
 .rail::before{content:"";position:absolute;left:var(--gutter);top:0;bottom:0;width:1px;background:var(--line);opacity:.4}
+/* 読んだところまで少し濃くなる。高さは JS（IntersectionObserver）が --read に入れる */
+.rail::after{content:"";position:absolute;left:var(--gutter);top:0;width:2px;margin-left:-.5px;height:var(--read,0px);background:var(--line);transition:height .35s ease}
 .rail__in{padding-left:var(--rail);padding-bottom:var(--sec)}
 
-/* 節どうしの間隔は上側だけで作る。上下を足すと導線が間延びする */
 .sec{padding-top:var(--sec)}
 .sec>h2{position:relative;font-size:var(--fs-h2);line-height:1.35}
-/* 導線から枝分かれするエルボー。角丸はこの折り返しだけに使う */
 .sec>h2::before{
   content:"";position:absolute;left:calc(-1*var(--rail));top:-.9em;
   width:calc(var(--rail) - .7rem);height:calc(.9em + .68em);
@@ -115,87 +169,187 @@ h1,h2,h3{font-feature-settings:"palt" 1;font-weight:700;word-break:auto-phrase}
   border-bottom-left-radius:8px;opacity:.55;
 }
 .sec>h2::after{content:"";position:absolute;left:-.7rem;top:calc(.68em - 4px);width:8px;height:8px;background:var(--line)}
+.sec.is-current>h2::after{background:var(--terminal)}
+.sec-lead{max-width:var(--measure);margin-top:1.35rem}
 
 /* --- ヒーロー ---------------------------------------------------------- */
-.hero{padding-top:clamp(2.75rem,7vw,4.5rem)}
+.hero{padding-top:clamp(2.5rem,6vw,4rem)}
 .hero h1{font-size:var(--fs-hero);line-height:1.28;letter-spacing:.01em}
-/* ヒーロー見出しの折り返し -------------------------------------------------
-   <br> で2行に固定すると 375px（見出しに使える幅 335px）で「工程を、」だけの
-   行が孤立する。「手で繰り返している工程を、」は 2rem で 420px あり、
-   1.75rem に落としても 368px で収まらない。収まるのは 1.5rem からだが、
-   それだと h2 の 1.75rem を下回って見出しの階層が壊れる。
-   そこで文節を nowrap の単位に切り、折り返しが必ず文節の切れ目で起きる
-   ようにしたうえで、2行組みが余裕をもって収まる 512px 以上でだけ
-   仕様書どおりの2行に固定する。狭い幅では3行を許容する。
-   336px 未満は最長の文節（約291px）自体が収まらないので nowrap を外す。 */
+/* 文節ごとに nowrap の単位にして、折り返しが文節の切れ目でしか起きないようにする。
+   2行組みが収まる 512px 以上でだけ2行に固定する。336px 未満は最長の文節が収まらないので外す。 */
 @media (min-width:21.5em){.hero__u{white-space:nowrap}}
 @media (min-width:32em){.hero__cl{display:block}}
 .hero__rule{width:7.5rem;height:2px;background:var(--line);margin-block:clamp(1.5rem,3.5vw,2rem) clamp(1.25rem,3vw,1.75rem)}
 .lead{max-width:var(--measure)}
-.terms{max-width:var(--measure);margin-top:clamp(1.75rem,4vw,2.5rem);padding-left:.9rem;border-left:2px solid var(--terminal);font-size:var(--fs-small);line-height:1.7;color:var(--ink)}
+.pillars3{margin-top:clamp(1.5rem,3vw,2rem);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.1rem 1.5rem}
+.pillars3 li{border-top:1px solid var(--line);padding-top:.7rem;font-size:var(--fs-small);line-height:1.75}
+.pillars3 strong{display:block;font-size:1rem;line-height:1.5;margin-bottom:.15rem}
 
-/* --- 結線図 ------------------------------------------------------------ */
-.wire{margin-top:clamp(2rem,5vw,3rem)}
-.wire__steps{position:relative;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));column-gap:.6rem}
-/* 6工程をつなぐ導線。工程の箱が --paper 地なので、線は箱の隙間にだけ見える */
-.wire__steps::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line);opacity:.4}
-.wire__step{position:relative;background:var(--paper);border:1px solid var(--line);border-color:color-mix(in srgb,var(--line) 45%,var(--paper));padding:.5rem .25rem;text-align:center;font-size:var(--fs-small);line-height:1.5;color:var(--mute)}
-.wire__bypass{display:flex;align-items:center;gap:.85rem;margin-top:1.5rem}
-.wire__label{flex:none;font-size:var(--fs-small);font-weight:700;line-height:1.5}
-.wire__track{position:relative;flex:1 1 auto;height:3px;min-width:2rem}
-.wire__draw{position:absolute;inset:0;background:var(--line);transform:scaleX(0);transform-origin:left center;animation:wire-draw .9s cubic-bezier(.22,.61,.36,1) both}
-.wire__term{position:absolute;right:-5px;top:50%;width:11px;height:11px;margin-top:-5.5px;background:var(--terminal);opacity:0;animation:wire-light .28s ease-out .9s both}
-@keyframes wire-draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-@keyframes wire-light{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+.pick{border:0;padding:0;margin:clamp(2rem,4vw,2.75rem) 0 0;min-width:0}
+.pick legend{padding:0;margin-bottom:.55rem;font-size:var(--fs-small);font-weight:700}
+.pick__opts{display:flex;flex-wrap:wrap;gap:.5rem}
+.opt{position:relative;display:inline-flex}
+.opt input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.opt label{display:inline-flex;align-items:center;min-height:44px;padding:.4rem 1.05rem;border:1px solid var(--line);font-size:.9375rem;line-height:1.4;background:transparent;pointer-events:none}
+.opt input:checked+label{background:var(--ink);color:var(--paper);border-color:var(--ink);box-shadow:inset 0 -3px 0 var(--terminal)}
+.opt input:active+label{transform:translateY(1px)}
+.opt input:focus-visible+label{outline:2px solid var(--terminal);outline-offset:2px;box-shadow:0 0 0 4px var(--ink)}
+.opt input:checked:focus-visible+label{box-shadow:inset 0 -3px 0 var(--terminal),0 0 0 4px var(--ink)}
 
-/* --- できること -------------------------------------------------------- */
-.skills{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(1.75rem,3.5vw,2.5rem);margin-top:2.25rem}
-.skill{border-top:1px solid var(--line);padding-top:1.1rem}
-.skill h3{font-size:var(--fs-h3);line-height:1.5}
-.skill p{margin-top:.5rem;max-width:var(--measure);font-size:var(--fs-small);line-height:1.8}
-.tasks{margin-top:1.1rem;max-width:var(--measure);font-size:var(--fs-small);line-height:1.7}
-.tasks li{position:relative;padding-left:1rem;margin-top:.55rem}
-.tasks li::before{content:"";position:absolute;left:0;top:.72em;width:.45rem;height:1px;background:var(--line)}
+/* 結線図（業務を選ぶ）。最終状態が通常の見え方で、アニメーションは「from」だけを書く */
+.wire{margin-top:clamp(1.25rem,3vw,1.75rem)}
+.wire-pane{display:none}
+.hero:has(#job-inv:checked) .wire-pane[data-job="inv"],
+.hero:has(#job-inq:checked) .wire-pane[data-job="inq"],
+.hero:has(#job-list:checked) .wire-pane[data-job="list"]{display:block}
+@supports not selector(:has(*)){.wire-pane{display:block}.wire-pane+.wire-pane{margin-top:2rem}}
+.wire-cap{margin-bottom:.55rem;font-size:var(--fs-small);font-weight:700;line-height:1.6}
+.wire-before{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.6rem}
+.wire-before li{border:1px solid color-mix(in srgb,var(--line) 45%,var(--paper));padding:.45rem .4rem;text-align:center;font-size:.8125rem;line-height:1.5;color:var(--mute);animation:wire-scatter .45s cubic-bezier(.22,.61,.36,1) both}
+.wire-before li:nth-child(1){--dx:-16px;--dy:26px;--rot:-4deg}
+.wire-before li:nth-child(2){--dx:10px;--dy:-14px;--rot:3deg}
+.wire-before li:nth-child(3){--dx:-6px;--dy:30px;--rot:2deg}
+.wire-before li:nth-child(4){--dx:14px;--dy:18px;--rot:-3deg}
+.wire-before li:nth-child(5){--dx:-12px;--dy:-10px;--rot:4deg}
+.wire-before li:nth-child(6){--dx:18px;--dy:24px;--rot:-2deg}
+.wire-after{position:relative;display:flex;justify-content:space-between;gap:.5rem;margin-top:1.6rem;padding-right:28px}
+.wire-after::before{content:"";position:absolute;left:0;right:0;top:5px;height:2px;background:var(--line);transform-origin:left center;animation:wire-draw .35s ease-out .3s both}
+.wire-after::after{content:"";position:absolute;right:0;top:0;width:12px;height:12px;background:var(--terminal);animation:wire-light .2s ease-out .8s both}
+.wire-after li{position:relative;flex:1 1 0;min-width:0;padding-top:1.4rem;font-size:.8125rem;line-height:1.5}
+.wire-after li::before{content:"";position:absolute;left:0;top:0;width:12px;height:12px;background:var(--line);animation:wire-pop .2s ease-out both}
+.wire-after li:nth-child(1)::before{animation-delay:.4s}
+.wire-after li:nth-child(2)::before{animation-delay:.5s}
+.wire-after li:nth-child(3)::before{animation-delay:.6s}
+.wire-after li:nth-child(4)::before{animation-delay:.7s}
+@keyframes wire-scatter{from{transform:translate(var(--dx,0),var(--dy,0)) rotate(var(--rot,0));opacity:0}to{transform:none;opacity:1}}
+@keyframes wire-draw{from{transform:scaleX(0)}to{transform:none}}
+@keyframes wire-draw-y{from{transform:scaleY(0)}to{transform:none}}
+@keyframes wire-pop{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+@keyframes wire-light{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
 
-/* --- 納めたもの -------------------------------------------------------- */
-.cases{margin-top:2.25rem;display:grid;gap:clamp(2rem,4vw,2.75rem)}
-.case{border-top:1px solid var(--line);padding-top:1.1rem}
-.case h3{font-size:var(--fs-h3);line-height:1.5}
-.case dl{margin-top:.85rem;display:grid;grid-template-columns:5.5em minmax(0,1fr);column-gap:1rem;row-gap:.35rem;max-width:calc(var(--measure) + 6.5em);font-size:var(--fs-small);line-height:1.8}
+.stats{margin-top:clamp(1.75rem,4vw,2.5rem);display:flex;flex-wrap:wrap;gap:1.1rem 2.75rem}
+.stats dt{font-size:var(--fs-small);line-height:1.6}
+.stats dd{font-size:var(--fs-small);line-height:1.6}
+.stat{font-family:"Inter Tight",var(--font);font-size:var(--fs-stat);font-weight:700;line-height:1.1}
+.stats small{display:block;font-size:var(--fs-small);color:var(--mute)}
+.terms{max-width:var(--measure);margin-top:clamp(1.5rem,3.5vw,2.25rem);padding-left:.9rem;border-left:2px solid var(--terminal);font-size:var(--fs-small);line-height:1.7}
+
+/* --- 実績 -------------------------------------------------------------- */
+.cases{margin-top:2.25rem;display:grid;gap:var(--case-gap)}
+.chain{display:grid;gap:var(--case-gap)}
+.chain-note{font-size:var(--fs-small);color:var(--mute);margin-bottom:calc(var(--case-gap) * -.45)}
+.case{position:relative;padding-top:1.1rem}
+.case h3{position:relative;font-size:var(--fs-h3);line-height:1.5}
+.case h3::before{content:"";position:absolute;left:calc(-1*var(--rail-x));top:.75em;width:calc(var(--rail-x) - 14px);border-top:1px solid var(--line)}
+.case h3::after{content:"";position:absolute;left:-17px;top:calc(.75em - 3px);width:7px;height:7px;background:var(--line)}
+.chain>.case:not(:first-of-type)::before{content:"";position:absolute;left:-14px;top:0;height:var(--dot-y);border-left:2px solid var(--line)}
+.chain>.case:not(:last-child)::after{content:"";position:absolute;left:-14px;top:var(--dot-y);height:calc(100% - var(--dot-y) + var(--case-gap));border-left:2px solid var(--line)}
+.case__meta{margin-top:.2rem;display:flex;flex-wrap:wrap;gap:.1rem 0;font-size:var(--fs-small);line-height:1.7}
+.case__meta>span:not(.chip){padding-right:.75rem;margin-right:.75rem;border-right:1px solid color-mix(in srgb,var(--line) 40%,var(--paper))}
+.case__meta>span:nth-last-child(2){border-right:0}
+.chip{display:inline-block;padding:0 .6rem;border:1px solid var(--line);font-weight:700;line-height:1.6}
+.case dl{margin-top:.85rem;display:grid;grid-template-columns:5.5em minmax(0,1fr);column-gap:1rem;row-gap:.45rem;max-width:calc(var(--measure) + 6.5em);font-size:var(--fs-small);line-height:1.8}
 .case dt{color:var(--mute)}
 .case dd{margin:0}
-.tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1rem}
-/* --mute は --paper-deep の上だと 4.15:1 しか出ないので、タグは地色のまま罫線で囲う */
-.tags li{border:1px solid color-mix(in srgb,var(--line) 35%,var(--paper));padding:.15rem .6rem;font-size:.8125rem;line-height:1.7;color:var(--mute)}
+.quote{display:block}
+.note{max-width:var(--measure);margin-top:.9rem;padding-left:.9rem;border-left:2px solid var(--line);font-size:var(--fs-small);line-height:1.75}
 
-/* --- 公開デモ ---------------------------------------------------------- */
-.sec-lead{max-width:var(--measure);margin-top:1.35rem}
-.demos{margin-top:2.25rem;display:grid;gap:clamp(2.5rem,5vw,3.5rem)}
-.demo h3{font-size:var(--fs-h3);line-height:1.5;border-top:1px solid var(--line);padding-top:1.1rem}
-.demo p{margin-top:.7rem;max-width:var(--measure);font-size:var(--fs-small);line-height:1.8}
-.demo__points{color:var(--mute);max-width:none}
-.demo figure{margin-top:1.35rem}
-.demo img{width:100%;border:1px solid var(--paper-deep)}
-.demo figcaption{margin-top:.6rem;font-size:var(--fs-small);line-height:1.7;word-break:break-all}
+/* --- できること -------------------------------------------------------- */
+.pillar{margin-top:2.25rem;border-top:1px solid var(--line);padding-top:1.1rem}
+.pillar h3{font-size:var(--fs-h3);line-height:1.5}
+.pillar>p{max-width:var(--measure);margin-top:.5rem;font-size:var(--fs-small);line-height:1.85}
+.career{font-weight:700}
+.demo{margin-top:1.25rem;padding:1.1rem 1.1rem 1.25rem;border:1px solid color-mix(in srgb,var(--line) 45%,var(--paper))}
+.demo h4{font-size:1rem;line-height:1.5}
+.fake{margin-top:.15rem;font-size:var(--fs-small);color:var(--mute)}
+.demo-body{margin-top:.9rem}
+.fields{display:flex;flex-wrap:wrap;align-items:flex-end;gap:.75rem}
+.field{display:grid;gap:.2rem;font-size:var(--fs-small);font-weight:700}
+.field select,.field input{min-height:44px;min-width:0;padding:.35rem .6rem;border:1px solid var(--line);background:var(--paper);color:var(--ink);font-weight:400}
+.field input{width:9.5rem}
+.demo-msg{min-height:1.7em;margin-top:.7rem;font-size:var(--fs-small);line-height:1.7;font-weight:700}
+.tbl{margin-top:.7rem;overflow-x:auto}
+.tbl table{width:100%;border-collapse:collapse;font-size:var(--fs-small);line-height:1.6}
+.tbl caption{padding-bottom:.4rem;text-align:left;font-weight:700}
+.tbl th,.tbl td{padding:.4rem .6rem;border:1px solid color-mix(in srgb,var(--line) 35%,var(--paper));text-align:left;vertical-align:top}
+.tbl thead th,.tbl tfoot th,.tbl tfoot td{background:var(--paper-deep)}
+.tbl td.num,.tbl th.num{text-align:right;white-space:nowrap}
+.tbl tr.is-doomed td{opacity:.55;text-decoration:line-through}
+.tbl td.is-changed{box-shadow:inset 3px 0 0 var(--terminal);background:color-mix(in srgb,var(--terminal) 16%,transparent)}
+.demo-actions{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.9rem}
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.gas{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:1rem 1.25rem;margin-top:.9rem}
+.gas-log{padding:.7rem .8rem;border:1px solid color-mix(in srgb,var(--line) 35%,var(--paper));font-size:var(--fs-small);line-height:1.7;min-height:11rem}
+.gas-log li{display:flex;gap:.6rem}
+.gas-log .t{flex:none;font-weight:700}
+html.js .gas-log li,html.js .gas-row,html.js .gas-ng{display:none}
+html.js .gas-log li.on{display:flex}
+html.js .gas-row.on{display:table-row}
+html.js .gas-ng.on{display:table-row}
+.gas-done{margin-top:.7rem;font-size:var(--fs-small);line-height:1.7;font-weight:700}
+html.js .gas-done [data-done]{display:none}
+html.js .gas-done [data-done].on{display:inline}
+/* タブ: JS が動くとき、開いているパネルだけ出す（mech は初期状態で閉じる）*/
+html.js #panel-mech:not(.is-open){display:none}
+html.js #panel-lp.is-closed{display:none}
 
-/* --- 技術と資格 -------------------------------------------------------- */
-.stack{margin-top:2.25rem;display:grid;gap:1.5rem}
-.stack h3{font-size:var(--fs-h3);line-height:1.5}
-.stack p{margin-top:.35rem;font-size:var(--fs-small);line-height:1.9}
+/* --- 自主制作 ---------------------------------------------------------- */
+.tabs{display:flex;gap:.25rem;margin-top:1.75rem;border-bottom:1px solid var(--line)}
+.tabs [role="tab"]{min-height:44px;padding:.4rem 1.3rem;border:0;border-bottom:3px solid transparent;background:transparent;color:var(--ink);font-weight:400;cursor:pointer;margin-bottom:-1px}
+.tabs [role="tab"][aria-selected="true"]{font-weight:700;border-bottom-color:var(--terminal)}
+.tabs [role="tab"]:active{background:var(--paper-deep)}
+html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.panel-title{font-size:var(--fs-h3);line-height:1.5;margin-top:2rem}
+[role="tabpanel"]{margin-top:1.5rem}
+.sites{display:grid;gap:2.5rem}
+.site{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:1rem 1.75rem;align-items:start}
+.site img{width:100%;border:1px solid var(--paper-deep)}
+.site h4{font-size:var(--fs-h3);line-height:1.5}
+.site p,.site dl{margin-top:.5rem;font-size:var(--fs-small);line-height:1.8}
+.site dl{display:grid;grid-template-columns:4.5em minmax(0,1fr);gap:.1rem .75rem}
+.site dt{color:var(--mute)}
+.site dd{margin:0}
+.site a{overflow-wrap:anywhere}
+.mech{display:grid;gap:2.25rem}
+.mech h4{font-size:var(--fs-h3);line-height:1.5}
+.mech p{max-width:var(--measure);margin-top:.4rem;font-size:var(--fs-small);line-height:1.85}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;margin-top:.9rem}
+.flow li{position:relative;padding:.5rem .8rem;border:1px solid color-mix(in srgb,var(--line) 45%,var(--paper));font-size:var(--fs-small);line-height:1.6}
+.flow li+li{margin-left:34px}
+.flow li+li::before{content:"";position:absolute;left:-35px;top:50%;width:34px;border-top:2px solid var(--line)}
+.flow li:last-child{box-shadow:inset 0 -3px 0 var(--terminal)}
+.flow-note{margin-top:.5rem;font-size:var(--fs-small);color:var(--mute)}
 
-/* --- 進め方 ------------------------------------------------------------ */
-.steps{margin-top:2.25rem;counter-reset:step;display:grid;gap:1.75rem}
+/* --- パッケージ -------------------------------------------------------- */
+.pkgs{margin-top:2.25rem;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2.25rem 1.75rem}
+.pkg img{width:100%;border:1px solid var(--paper-deep)}
+.pkg h3{margin-top:.8rem;font-size:1rem;line-height:1.6}
+.price{margin:.25rem 0 .8rem;font-family:"Inter Tight",var(--font);font-size:1.25rem;font-weight:700;line-height:1.4}
+
+/* --- 頼めるか診断 ------------------------------------------------------ */
+.q{border:0;padding:0;margin-top:1.6rem;min-width:0}
+.q legend{padding:0;margin-bottom:.55rem;font-weight:700;line-height:1.6}
+.result{margin-top:1.75rem;padding:1.1rem 1.25rem;border-left:3px solid var(--terminal);background:var(--paper-deep)}
+.result p{max-width:var(--measure)}
+.result .pkg{margin-top:1rem;max-width:26rem}
+.result .btns{margin-top:1rem}
+.diag-static table{width:100%;border-collapse:collapse;font-size:var(--fs-small);line-height:1.7;margin-top:1.25rem}
+.diag-static th,.diag-static td{padding:.5rem .7rem;border:1px solid color-mix(in srgb,var(--line) 35%,var(--paper));text-align:left;vertical-align:top}
+.diag-static th{background:var(--paper-deep)}
+.diag-static .result{margin-top:1rem}
+
+/* --- 進め方・資格・依頼先 ---------------------------------------------- */
+.steps{margin-top:2rem;counter-reset:step;display:grid;gap:1.6rem}
 .step{position:relative;counter-increment:step;padding-left:3rem}
 .step::before{content:counter(step,decimal-leading-zero);position:absolute;left:0;top:.05em;font-weight:700;font-size:1.0625rem;color:var(--line);letter-spacing:.02em}
 .step h3{font-size:var(--fs-h3);line-height:1.5}
-.step p{margin-top:.3rem;max-width:var(--measure);font-size:var(--fs-small);line-height:1.8}
-
-/* --- 依頼する ---------------------------------------------------------- */
-.cta{background:var(--paper-deep);padding:clamp(1.75rem,4vw,2.5rem);margin-top:2.25rem}
+.step p{max-width:var(--measure);margin-top:.3rem;font-size:var(--fs-small);line-height:1.8}
+.quals{margin-top:1.5rem;font-size:var(--fs-small);line-height:1.8}
+.quals li{position:relative;padding-left:1rem;margin-top:.35rem}
+.quals li::before{content:"";position:absolute;left:0;top:.85em;width:.45rem;height:1px;background:var(--line)}
+.cta{margin-top:1.75rem;padding:clamp(1.5rem,4vw,2.25rem);background:var(--paper-deep)}
 .cta p{max-width:var(--measure)}
-.btns{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:1.75rem}
-.btn{display:inline-block;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:700;font-size:.9375rem;line-height:1.5;padding:.85rem 1.5rem;border-bottom:3px solid var(--terminal)}
-.btn:hover{background:#1b2740}
+.cta .btns{margin-top:1.5rem}
 .btn-note{margin-top:1rem;font-size:var(--fs-small);line-height:1.7}
 
 /* --- フッター ---------------------------------------------------------- */
@@ -205,39 +359,42 @@ h1,h2,h3{font-feature-settings:"palt" 1;font-weight:700;word-break:auto-phrase}
 
 /* --- 狭い画面 ---------------------------------------------------------- */
 @media (max-width:56.24em){
-  .skills{grid-template-columns:1fr}
-  .wire__steps{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:1.25rem}
-  .wire__steps::before{display:none}
-  .wire__step::after{content:"";position:absolute;right:-.6rem;top:50%;width:.6rem;height:1px;background:var(--line);opacity:.4}
-  .wire__step:nth-child(3n)::after,.wire__step:last-child::after{display:none}
+  .wire-before{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .gas{grid-template-columns:1fr}
 }
 @media (max-width:47.99em){
-  /* 導線はページ左端の10pxの帯に残す。h2・h3・本文の左端は36px（--rail）で揃え、
-     端子だけが帯に張り出す（PCと同じ構造）。左端を28pxにすると枝が7pxしか取れず
-     「分岐」に見えないため36pxにした。本文はこれで375pxのとき幅319px・20文字。
-     エルボーの角丸は幅が足りないので、狭い幅では横線＋ドットに簡略化する。 */
-  :root{--rail:2.25rem}
+  /* 導線はページ左端の10pxの帯に残す。見出し・本文の左端は36px（--rail）で揃え、端子だけが帯に張り出す */
+  :root{--rail:2.25rem;--rail-x:calc(var(--rail) - .625rem)}
   .rail{padding-left:0}
-  .rail::before{left:.625rem}
+  .rail::before,.rail::after{left:.625rem}
   .sec>h2{padding-left:0}
-  .sec>h2::before{left:calc(-1 * var(--rail) + .625rem + 1px);top:.68em;width:calc(var(--rail) - 1.25rem - 1px);height:0;border-left:0;border-bottom:1px solid var(--line);border-radius:0}
+  .sec>h2::before{left:calc(-1*var(--rail) + .625rem + 1px);top:.68em;width:calc(var(--rail) - 1.25rem - 1px);height:0;border-left:0;border-bottom:1px solid var(--line);border-radius:0}
   .sec>h2::after{left:-.625rem;top:calc(.68em - 3px);width:6px;height:6px}
+  .pillars3{grid-template-columns:1fr}
+  .pair,.site,.pkgs{grid-template-columns:1fr}
   .case dl{grid-template-columns:1fr;row-gap:0}
   .case dt{margin-top:.6rem}
-  .btn{flex:1 1 100%;text-align:center}
+  .btn{flex:1 1 100%}
+  .btns{width:100%}
+  .demo{padding:.9rem .85rem 1.1rem}
 }
 @media (max-width:34.99em){
-  /* 結線図は縦積みに切り替える。導線は工程の箱の裏を縦に通す */
-  .wire__steps{grid-template-columns:1fr;row-gap:.85rem}
-  .wire__steps::before{display:block;left:1.25rem;right:auto;top:0;bottom:0;width:1px;height:auto}
-  .wire__step{text-align:left;padding-left:2.5rem}
-  .wire__step::after{display:none}
+  .wire-before{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .wire-after{flex-direction:column;gap:.9rem;padding:0 0 28px 28px}
+  .wire-after::before{left:5px;right:auto;top:0;bottom:0;width:2px;height:auto;transform-origin:top center;animation-name:wire-draw-y}
+  .wire-after::after{left:0;right:auto;top:auto;bottom:0}
+  .wire-after li{padding:0}
+  .wire-after li::before{left:-28px;top:.3em}
+  .flow{flex-direction:column}
+  .flow li+li{margin-left:0;margin-top:30px}
+  .flow li+li::before{left:50%;top:-31px;width:0;height:30px;border-top:0;border-left:2px solid var(--line)}
 }
-
+@media (max-width:29.99em){
+  .head__role{display:none}
+}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .wire__draw{animation:none;transform:none}
-  .wire__term{animation:none;opacity:1;transform:none}
+  *,*::before,*::after{animation:none!important;transition:none!important}
 }
 </style>
 </head>
@@ -248,11 +405,12 @@ h1,h2,h3{font-feature-settings:"palt" 1;font-weight:700;word-break:auto-phrase}
   <div class="head__in">
     <div>
       <span class="head__name">wada3333</span>
-      <span class="head__role">業務自動化 / Google Workspace / Web制作</span>
+      <span class="head__role">リスト作成 / 管理表 / 業務の自動化 / LP制作</span>
     </div>
     <div class="head__right">
       <span class="status">受付中</span>
       <a class="head__cta" href="#contact">依頼する</a>
+      <button type="button" class="theme-toggle js-only" aria-label="表示の明るさを切り替える"></button>
     </div>
   </div>
 </header>
@@ -260,167 +418,495 @@ h1,h2,h3{font-feature-settings:"palt" 1;font-weight:700;word-break:auto-phrase}
 <main id="main" class="rail">
 <div class="rail__in">
 
-  <section class="hero">
-    <h1><span class="hero__cl"><span class="hero__u">手で繰り返している</span><span class="hero__u">工程を、</span></span><span class="hero__cl"><span class="hero__u">1本の線に</span><span class="hero__u">置き換えます。</span></span></h1>
+  <!-- 1 ヒーロー -->
+  <section class="hero" id="top" aria-labelledby="catch">
+    <h1 id="catch"><span class="hero__cl"><span class="hero__u">手で繰り返している</span><span class="hero__u">作業を、</span></span><span class="hero__cl"><span class="hero__u">自動で回る</span><span class="hero__u">仕組みにします。</span></span></h1>
     <div class="hero__rule"></div>
-    <p class="lead">通信インフラの構築現場で8年、プロジェクトリーダーとしてシステム導入と運用の自動化をやってきました。その手法を、そのまま中小規模の業務に持ち込みます。スプレッドシートの転記、メールの仕分け、集計と通知——動かし続ける前提で組みます。</p>
+    <p class="lead">大手通信インフラ企業でプロジェクトリーダーをしています<span class="nw">（構築・PL歴8年）</span>。副業として、平日の夜と週末に対応しています。</p>
+
+    <ul class="pillars3">
+      <li><strong>リスト作成・リサーチ</strong>公式サイトや公的なデータベースから、営業リストや調査表を作ります。</li>
+      <li><strong>Excel・スプレッドシートの管理表</strong>入力するだけで集計まで終わる表を作ります。</li>
+      <li><strong>GAS・AIでの自動化</strong>転記・集計・通知などの手作業を、Google Apps Script で自動にします。</li>
+    </ul>
+
+    <fieldset class="pick">
+      <legend>業務を選ぶ</legend>
+      <div class="pick__opts">
+        <span class="opt"><input type="radio" name="job" id="job-inv" checked><label for="job-inv">請求書の整理</label></span>
+        <span class="opt"><input type="radio" name="job" id="job-inq"><label for="job-inq">問い合わせ対応</label></span>
+        <span class="opt"><input type="radio" name="job" id="job-list"><label for="job-list">リスト作成</label></span>
+      </div>
+    </fieldset>
 
     <div class="wire">
-      <ul class="wire__steps">
-        <li class="wire__step">受信</li>
-        <li class="wire__step">転記</li>
-        <li class="wire__step">突合</li>
-        <li class="wire__step">集計</li>
-        <li class="wire__step">作成</li>
-        <li class="wire__step">通知</li>
-      </ul>
-      <p class="wire__bypass">
-        <span class="wire__label">自動化後</span>
-        <span class="wire__track"><span class="wire__draw"></span><span class="wire__term"></span></span>
-      </p>
+      <div class="wire-pane" data-job="inv">
+        <p class="wire-cap">自動化前（手作業の6工程）</p>
+        <ol class="wire-before"><li>メールを開く</li><li>PDFを保存</li><li>名前を付け直す</li><li>フォルダに分ける</li><li>一覧に転記</li><li>二重保存を確認</li></ol>
+        <p class="wire-cap" style="margin-top:1.4rem">自動化後</p>
+        <ol class="wire-after"><li>受信</li><li>名前を付ける</li><li>フォルダに分ける</li><li>一覧に記録</li></ol>
+        <p class="sr" data-summary>請求書の整理は、手作業の6工程が、受信、名前を付ける、フォルダに分ける、一覧に記録の4工程で自動になります。</p>
+      </div>
+      <div class="wire-pane" data-job="inq">
+        <p class="wire-cap">自動化前（手作業の6工程）</p>
+        <ol class="wire-before"><li>受信箱を見る</li><li>内容を読む</li><li>担当を決める</li><li>表に転記</li><li>担当に連絡</li><li>漏れを確認</li></ol>
+        <p class="wire-cap" style="margin-top:1.4rem">自動化後</p>
+        <ol class="wire-after"><li>受信</li><li>AIで分類</li><li>表に記録</li><li>担当へ通知</li></ol>
+        <p class="sr" data-summary>問い合わせ対応は、手作業の6工程が、受信、AIで分類、表に記録、担当へ通知の4工程で自動になります。</p>
+      </div>
+      <div class="wire-pane" data-job="list">
+        <p class="wire-cap">自動化前（手作業の6工程）</p>
+        <ol class="wire-before"><li>検索する</li><li>サイトを開く</li><li>項目をコピー</li><li>表に貼る</li><li>表記をそろえる</li><li>重複を消す</li></ol>
+        <p class="wire-cap" style="margin-top:1.4rem">自動化後（集める部分は目で確認します）</p>
+        <ol class="wire-after"><li>集める（目で確認）</li><li>表記をそろえる</li><li>重複を消す</li><li>出典付きで納品</li></ol>
+        <p class="sr" data-summary>リスト作成は、集める部分は目で確認し、表記をそろえる、重複を消す、出典付きで納品の流れが自動になります。</p>
+      </div>
+      <p class="sr js-only" aria-live="polite" data-wire-live></p>
     </div>
 
-    <p class="terms">平日夜間と土日で対応しています。やり取りはチャットのみ、通話・訪問は行いません。</p>
+    <dl class="stats">
+      <div><dt>ランサーズ 満足</dt><dd><span class="stat">4</span>件<small>うち3件は、同じ会社から続けてのご依頼</small></dd></div>
+      <div><dt>クラウドワークス評価</dt><dd><span class="stat">5.0</span>（2件）</dd></div>
+    </dl>
+
+    <p class="terms">平日は21時以降と、土日祝に対応しています。やり取りはチャットのみで、通話・訪問は行いません。</p>
   </section>
 
-  <section class="sec" id="skills">
-    <h2>できること</h2>
-    <div class="skills">
-      <div class="skill">
-        <h3>業務自動化（GAS・API連携）</h3>
-        <p>Google Apps Scriptを中心に、いま人がやっている手順をそのまま置き換えます。動かしたあとに壊れないよう、エラー時の通知と復旧手順まで含めて納品します。</p>
-        <ul class="tasks">
-          <li>Gmail受信 → 内容判定 → スプレッドシート記録</li>
-          <li>複数ブックの突合・集計・帳票出力</li>
-          <li>フォーム受付から通知・台帳更新までの一気通貫</li>
-          <li>外部API（OpenAI / Gemini など）を挟んだ自動仕分け</li>
-        </ul>
-      </div>
-      <div class="skill">
-        <h3>Google Workspace 運用・管理</h3>
-        <p>大規模なアカウント／端末管理で使ってきた運用設計を、そのまま縮小して提供します。組織の作り方と権限の切り方を最初に決めておくと、後の事故がほぼなくなります。</p>
-        <ul class="tasks">
-          <li>組織部門・グループ・共有ドライブの設計</li>
-          <li>端末（Chrome OS等）の一括登録とポリシー適用</li>
-          <li>外部共有・アクセス権限のトラブル調査と是正</li>
-          <li>Directory APIによる棚卸し・台帳自動生成</li>
-        </ul>
-      </div>
-      <div class="skill">
-        <h3>Web制作（LP・フォーム連携）</h3>
-        <p>見た目だけでなく、送信された内容がどこに溜まって誰に届くかまで作ります。サーバー不要の構成にして、運用費をかけずに保守できる形で渡します。</p>
-        <ul class="tasks">
-          <li>ランディングページの設計・実装・公開</li>
-          <li>フォーム → スプレッドシート → 通知の非同期連携</li>
-          <li>表示速度・アクセシビリティの担保</li>
-          <li>計測イベントの設計と設置</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
+  <!-- 2 実績 -->
   <section class="sec" id="works">
-    <h2>納めたもの</h2>
+    <h2>実績</h2>
+    <p class="sec-lead">ランサーズとクラウドワークスで受けた案件です。社名は伏せています。</p>
     <div class="cases">
       <article class="case">
-        <h3>Case 1 — 商業施設の出店テナント調査リスト</h3>
+        <h3>確定申告用の不動産収支 Excel 管理表</h3>
+        <p class="case__meta"><span>クラウドワークス</span> <span>個人の収益物件オーナー様</span> <span class="chip">評価5.0</span></p>
         <dl>
-          <dt>課題</dt><dd>イベント協業の候補先を探すため、施設ごとの入居店舗を横断で集める必要があった</dd>
-          <dt>やったこと</dt><dd>対象施設の店舗情報を収集し、項目を揃えたスプレッドシートに整形して納品</dd>
-          <dt>結果</dt><dd>納期内に検収完了。発注者から満足の評価を受領</dd>
+          <dt>課題</dt><dd>家賃と経費を、確定申告に使える形で管理したい</dd>
+          <dt>対応</dt><dd>家賃・経費を1行ずつ入力するだけで、物件別・月別・年間の集計と減価償却を自動で計算する Excel を作成。物件3件と、白色・青色の両方の申告に対応し、使い方のシートを分けて納品した。納品後の修正依頼（科目プルダウンの並び替え、見出しの色の変更）にも対応</dd>
+          <dt>結果</dt><dd>評価5.0</dd>
         </dl>
-        <ul class="tags"><li>データ収集</li><li>スプレッドシート整形</li></ul>
+        <p class="note">※税務相談や申告書の作成代行は行っていません。確定申告に向けた記帳・集計のしくみ（Excel管理表など）づくりを担当します。</p>
       </article>
+
+      <div class="chain" role="group" aria-labelledby="chain-note">
+        <p class="chain-note" id="chain-note">同じ会社から続けて3回のご依頼</p>
+        <article class="case">
+          <h3>商業施設の店舗リスト（29拠点・171店舗）</h3>
+          <p class="case__meta"><span>ランサーズ</span> <span>法人</span> <span class="chip">満足</span></p>
+          <dl>
+            <dt>課題</dt><dd>イベントで協業できそうな店舗を、29の商業施設から横断で探したい</dd>
+            <dt>対応</dt><dd>最初にサンプルの行で抽出の基準をすり合わせてから、各施設の公式サイトで占い・マッサージ・薬局・化粧品ブランドなどの入居店舗を調べ、171店舗をURL付きで一覧にした</dd>
+            <dt>結果</dt><dd>満足評価。<span class="quote">「次回も相談したいと思います。」</span></dd>
+          </dl>
+        </article>
+
+        <article class="case">
+          <h3>イベント登壇者の肩書き・顔写真の調査</h3>
+          <p class="case__meta"><span>ランサーズ</span> <span>店舗リストと同じ会社（2回目のご依頼）</span> <span class="chip">満足</span></p>
+          <dl>
+            <dt>課題</dt><dd>イベントで使う登壇者約30名の肩書きと写真を、週末の短い納期でそろえたい</dd>
+            <dt>対応</dt><dd>公的機関などの公式サイトで肩書き・ふりがなを確かめて Excel にまとめ、写真は「肩書き・名前」のファイル名で保存して zip で納品した。納品後に追加された分にも対応</dd>
+            <dt>結果</dt><dd>満足評価。<span class="quote">「急な依頼を要望通りにやって頂きありがとうございました。」</span></dd>
+          </dl>
+        </article>
+        <article class="case">
+          <h3>イベント投影スライドの入力・修正と本番当日までの調整</h3>
+          <p class="case__meta"><span>ランサーズ</span> <span>店舗リストと同じ会社（3回目のご依頼）</span> <span class="chip">満足</span></p>
+          <dl>
+            <dt>課題</dt><dd>イベントで投影するスライドを、本番までに台本どおりに仕上げたい</dd>
+            <dt>対応</dt><dd>台本・名簿とスライドを1枚ずつ照らし合わせ、足りないスライドの追加、氏名・肩書きの食い違いの指摘、表示崩れの修正を行い、約80枚の修正版を本番前に納品した。本番直前の並び替えや差し替えにも対応</dd>
+            <dt>結果</dt><dd>満足評価。<span class="quote">「本番まで伴走までして頂き本当にありがとうございました」</span><span class="quote">「非常に頼もしいランサーさんです。」</span></dd>
+          </dl>
+        </article>
+      </div>
+
       <article class="case">
-        <h3>Case 2 — 電子部材の仕様・調達先調査</h3>
+        <h3>海外展開に向けた電子部材の調査</h3>
+        <p class="case__meta"><span>ランサーズ</span> <span>法人</span> <span class="chip">満足</span></p>
         <dl>
-          <dt>課題</dt><dd>開発中デバイスに使う部材の候補と入手経路を短期間で洗い出したかった</dd>
-          <dt>やったこと</dt><dd>仕様条件に合致する部材を調査し、比較可能な形で一覧化</dd>
-          <dt>結果</dt><dd>完遂。以降も継続して相談を受ける関係になった</dd>
+          <dt>課題</dt><dd>製品の海外展開に向けて、各国の法規制・認証に合う電子部材を探したい</dd>
+          <dt>対応</dt><dd>Wi-Fiドングル・電源タップ・AC線について、対象国ごとの無線認証と電源規格に合う候補を調べ、比較できる形で一覧化</dd>
+          <dt>結果</dt><dd>満足評価。<span class="quote">「とても丁寧に対応いただきました。」</span></dd>
         </dl>
-        <ul class="tags"><li>技術調査</li><li>比較整理</li></ul>
-      </article>
-      <article class="case">
-        <h3>Case 3 — 勤怠管理システム（自社開発）</h3>
-        <dl>
-          <dt>課題</dt><dd>打刻と集計が分かれていて、残業の超過に気づくのが月末になっていた</dd>
-          <dt>やったこと</dt><dd>GASとHTML Serviceで打刻・有給申請・集計を1つに統合。36協定の超過を事前予測し、給与概算を自動でメール配信する仕組みを実装</dd>
-          <dt>結果</dt><dd>月次の集計作業と、超過の見落としをなくした</dd>
-        </dl>
-        <ul class="tags"><li>Google Apps Script</li><li>HTML Service</li><li>自動メール配信</li></ul>
       </article>
     </div>
   </section>
 
-  <section class="sec" id="demos">
-    <h2>公開デモ</h2>
-    <p class="sec-lead">同じ作り方をどの案件にも当てはめてはいません。このページはJavaScriptを使わずに組み（計測時点のモバイルLighthouseはPerformance 98、他の3項目が100）、下の2本では動きと画面上の操作を実装しています。</p>
-    <div class="demos">
-      <article class="demo">
-        <h3>株式会社クロステック・アーキテクツ（架空）</h3>
-        <p>中小企業向けの業務自動化コンサルを想定したBtoBサイト。導入効果を試算するスライダーと、サーバーを使わないフォーム送信を実装しています。</p>
-        <p class="demo__points">見どころ: ROIシミュレーター / Google Apps Script連携フォーム / ダークモード</p>
-        <figure>
-          <img src="assets/images/demo-crosstech.webp" width="1440" height="900" loading="lazy" decoding="async"
-               alt="CROSSTECH ARCHITECTS のトップページ。暗い執務室の写真の上に「バックオフィスを、次世代のエンジンへ。」という見出しと、無料シミュレーション・相談のボタンが置かれている。">
-          <figcaption><a href="https://wada3333.github.io/crosstech-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/crosstech-lp/</a></figcaption>
-        </figure>
-      </article>
-      <article class="demo">
-        <h3>STUDIO CORE（架空）</h3>
-        <p>パーソナルジムを題材にした、申し込み導線重視のBtoC向けLP。空き枠の表示から申し込み完了までを1画面で完結させています。</p>
-        <p class="demo__points">見どころ: 予約フォームの空き枠連携 / 表示速度 / 計測イベント設計</p>
-        <figure>
-          <img src="assets/images/demo-studio-core.webp" width="1440" height="900" loading="lazy" decoding="async"
-               alt="STUDIO CORE のトップページ。明るい個室スタジオの写真の上に「続かなかった人が、続けている。」という見出しと、無料カウンセリングを予約するボタンが置かれている。">
-          <figcaption><a href="https://wada3333.github.io/studio-core-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/studio-core-lp/</a></figcaption>
-        </figure>
-      </article>
+  <!-- 3 できること -->
+  <section class="sec" id="skills">
+    <h2>できること</h2>
+
+    <div class="pillar">
+      <h3>リスト作成・リサーチ</h3>
+      <p>公式サイトや公的なデータベースから、営業リストや調査表を作ります。出典のURLも付けられます。</p>
+
+      <div class="demo" id="demo-list">
+        <h4>リスト整形を触ってみる</h4>
+        <p class="fake">架空のデータです</p>
+        <div class="demo-body">
+          <div class="demo-actions js-only">
+            <button type="button" class="btn" data-act="unify">表記ゆれを統一</button>
+            <button type="button" class="btn" data-act="dedupe">重複を削除</button>
+            <button type="button" class="btn btn--sub" data-act="reset">元に戻す</button>
+          </div>
+          <p class="demo-msg" aria-live="polite">
+            <span hidden data-msg="unify-done"><span class="n"></span>件を統一しました。</span>
+            <span hidden data-msg="unify-none">統一するものはありません。</span>
+            <span hidden data-msg="dedupe-done"><span class="n"></span>件を削除しました。</span>
+            <span hidden data-msg="dedupe-none">削除するものはありません。</span>
+            <span hidden data-msg="reset">最初の状態に戻しました。</span>
+          </p>
+          <div class="tbl">
+            <table class="list-live">
+              <caption><span class="static-only">整形前の</span>店舗リスト（10行）</caption>
+              <thead><tr><th scope="col">店名</th><th scope="col">区分</th><th scope="col">電話番号</th></tr></thead>
+              <tbody>
+                <tr><td data-fixed="株式会社みどり薬局">（株）みどり薬局</td><td>薬局</td><td>03-0000-0001</td></tr>
+                <tr><td>株式会社みどり薬局</td><td>薬局</td><td>03-0000-0001</td></tr>
+                <tr><td>星読みサロン ルナ</td><td>占い</td><td>03-0000-0002</td></tr>
+                <tr><td>星読みサロン ルナ</td><td>占い</td><td data-fixed="03-0000-0002">０３－００００－０００２</td></tr>
+                <tr><td>ほぐし処 やすらぎ</td><td>マッサージ</td><td>03-0000-0003</td></tr>
+                <tr><td data-fixed="株式会社ひなた化粧品">（株）ひなた化粧品</td><td>化粧品</td><td data-fixed="03-0000-0004">０３－００００－０００４</td></tr>
+                <tr><td>株式会社あおぞら雑貨</td><td>雑貨</td><td>03-0000-0005</td></tr>
+                <tr><td>ほぐし処 やすらぎ</td><td>マッサージ</td><td>03-0000-0003</td></tr>
+                <tr><td data-fixed="株式会社さくら調剤">（株）さくら調剤</td><td>薬局</td><td>03-0000-0006</td></tr>
+                <tr><td>美容サロン コスモス</td><td>美容</td><td data-fixed="03-0000-0007">０３－００００－０００７</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="tbl static-only">
+            <table>
+              <caption>整形後の店舗リスト（表記をそろえ、重複を消した7行）</caption>
+              <thead><tr><th scope="col">店名</th><th scope="col">区分</th><th scope="col">電話番号</th></tr></thead>
+              <tbody>
+                <tr><td>株式会社みどり薬局</td><td>薬局</td><td>03-0000-0001</td></tr>
+                <tr><td>星読みサロン ルナ</td><td>占い</td><td>03-0000-0002</td></tr>
+                <tr><td>ほぐし処 やすらぎ</td><td>マッサージ</td><td>03-0000-0003</td></tr>
+                <tr><td>株式会社ひなた化粧品</td><td>化粧品</td><td>03-0000-0004</td></tr>
+                <tr><td>株式会社あおぞら雑貨</td><td>雑貨</td><td>03-0000-0005</td></tr>
+                <tr><td>株式会社さくら調剤</td><td>薬局</td><td>03-0000-0006</td></tr>
+                <tr><td>美容サロン コスモス</td><td>美容</td><td>03-0000-0007</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pillar">
+      <h3>Excel・スプレッドシートの管理表づくり</h3>
+      <p>顧客管理表や、売上・経費の集計表など、入力するだけで集計まで終わる表を作ります。</p>
+      <p class="career">元税務署職員（個人課税部門）、日商簿記2級</p>
+      <p class="note">※税務相談や申告書の作成代行は行っていません。確定申告に向けた記帳・集計のしくみ（Excel管理表など）づくりを担当します。</p>
+
+      <div class="demo" id="demo-sheet">
+        <h4>Excel管理表を触ってみる</h4>
+        <p class="fake">架空のデータです</p>
+        <div class="demo-body">
+          <div class="fields js-only">
+            <label class="field">月
+              <select data-f="month"><option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4" selected>4月</option><option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option><option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option></select>
+            </label>
+            <label class="field">区分
+              <select data-f="kind"><option value="in" selected>家賃収入</option><option value="ex">経費</option></select>
+            </label>
+            <label class="field">金額
+              <input type="text" inputmode="numeric" autocomplete="off" data-f="amount" value="50000">
+            </label>
+            <button type="button" class="btn" data-act="add">追加</button>
+            <button type="button" class="btn btn--sub" data-act="reset">最初の状態に戻す</button>
+          </div>
+          <p class="demo-msg" aria-live="polite">
+            <span hidden data-msg="added">月ごとの集計を更新しました。</span>
+            <span hidden data-msg="bad">金額は半角の数字（9桁まで）で入力してください。</span>
+            <span hidden data-msg="reset">最初の状態に戻しました。</span>
+          </p>
+          <div class="tbl">
+            <table class="sheet">
+              <caption>月ごとの集計（単位: 円）</caption>
+              <thead><tr><th scope="col">月</th><th scope="col" class="num">収入</th><th scope="col" class="num">経費</th><th scope="col" class="num">収支</th></tr></thead>
+              <tbody>
+                <tr data-m="1" hidden><th scope="row">1月</th><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+                <tr data-m="2" hidden><th scope="row">2月</th><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+                <tr data-m="3" hidden><th scope="row">3月</th><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+                <tr data-m="4"><th scope="row">4月</th><td class="num">85,000</td><td class="num">12,000</td><td class="num">73,000</td></tr>
+                <tr data-m="5"><th scope="row">5月</th><td class="num">85,000</td><td class="num">8,500</td><td class="num">76,500</td></tr>
+                <tr data-m="6"><th scope="row">6月</th><td class="num">85,000</td><td class="num">23,000</td><td class="num">62,000</td></tr>
+                <tr data-m="7" hidden><th scope="row">7月</th><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+                <tr data-m="8" hidden><th scope="row">8月</th><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+                <tr data-m="9" hidden><th scope="row">9月</th><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+                <tr data-m="10" hidden><th scope="row">10月</th><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+                <tr data-m="11" hidden><th scope="row">11月</th><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+                <tr data-m="12" hidden><th scope="row">12月</th><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+              </tbody>
+              <tfoot><tr><th scope="row">年間合計</th><td class="num" data-t="in">255,000</td><td class="num" data-t="ex">43,500</td><td class="num" data-t="bal">211,500</td></tr></tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pillar">
+      <h3>GAS・AIでの自動化</h3>
+      <p>転記・集計、Gmailでの通知、LINEやフォームとの連携、売上と入金の突き合わせ、請求書PDFの整理などを、Google Apps Script で自動にします。OpenAI API などを使った自動の判定も組み込めます。</p>
+
+      <div class="demo" id="demo-gas">
+        <h4>GAS実行を触ってみる</h4>
+        <p class="fake">架空のデータです</p>
+        <div class="demo-body">
+          <div class="demo-actions js-only">
+            <button type="button" class="btn" data-act="run"><span data-lbl="run">実行</span><span data-lbl="again" hidden>もう一度実行</span></button>
+          </div>
+          <div class="gas">
+            <div>
+              <ol class="gas-log" aria-label="実行ログ">
+                <li data-step="0"><span class="t">21:00:01</span><span>実行を開始しました</span></li>
+                <li data-step="1"><span class="t">21:00:02</span><span>未処理のメール6件を取得しました</span></li>
+                <li data-step="2" data-row="0"><span class="t">21:00:03</span><span>1件目を記録しました</span></li>
+                <li data-step="3" data-row="1"><span class="t">21:00:03</span><span>2件目を記録しました</span></li>
+                <li data-step="4" data-row="2"><span class="t">21:00:04</span><span>3件目を記録しました</span></li>
+                <li data-step="5" data-row="3"><span class="t">21:00:04</span><span>4件目を記録しました</span></li>
+                <li data-step="6" data-row="4"><span class="t">21:00:05</span><span>5件目を記録しました</span></li>
+                <li data-step="7" data-ng><span class="t">21:00:05</span><span>6件目は形式が読み取れませんでした。「要確認」シートに残します</span></li>
+                <li data-step="8"><span class="t">21:00:06</span><span>実行を終了しました</span></li>
+              </ol>
+            </div>
+            <div>
+              <div class="tbl">
+                <table>
+                  <caption>記録先のシート</caption>
+                  <thead><tr><th scope="col">受付日</th><th scope="col">区分</th><th scope="col">内容</th><th scope="col">担当</th></tr></thead>
+                  <tbody>
+                    <tr class="gas-row"><td>10/01</td><td>見積もり</td><td>在庫管理表の作成</td><td>田中</td></tr>
+                    <tr class="gas-row"><td>10/01</td><td>修正</td><td>集計式の見直し</td><td>鈴木</td></tr>
+                    <tr class="gas-row"><td>10/02</td><td>見積もり</td><td>日報の自動転記</td><td>高橋</td></tr>
+                    <tr class="gas-row"><td>10/02</td><td>質問</td><td>請求書PDFの整理</td><td>渡辺</td></tr>
+                    <tr class="gas-row"><td>10/03</td><td>見積もり</td><td>入金の突き合わせ</td><td>伊藤</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="tbl">
+                <table>
+                  <caption>別のシート「要確認」</caption>
+                  <thead><tr><th scope="col">受付日</th><th scope="col">内容</th></tr></thead>
+                  <tbody><tr class="gas-ng"><td>10/03</td><td>本文の形式が読み取れませんでした</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <p class="gas-done" aria-live="polite"><span data-done>5件を記録しました。1件は形式が読み取れなかったため、別のシートに残しました</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pillar">
+      <h3>LP制作</h3>
+      <p>フォームから送られた内容をスプレッドシートに記録し、通知まで行うLPを作ります。このページも、その作り方の見本として作っています。</p>
+      <p><a class="btn btn--sub" href="#makes" data-open-tab="lp">自主制作のLPを見る</a></p>
     </div>
   </section>
 
-  <section class="sec" id="stack">
-    <h2>技術と資格</h2>
-    <div class="stack">
-      <div>
-        <h3>作るもの</h3>
-        <p>Google Apps Script / JavaScript (ES6+) / HTML5 / CSS3 / Python / Google Sheets API / Directory API / 各種LLM API</p>
+  <!-- 4 自主制作 -->
+  <section class="sec" id="makes">
+    <h2>自主制作</h2>
+    <p class="sec-lead">架空の会社やお店、社内の仕組みを想定して作ったものです。実際の案件ではありません。</p>
+
+    <div class="tabs js-only" role="tablist" aria-label="自主制作の種類">
+      <button type="button" role="tab" id="tab-lp" aria-controls="panel-lp" aria-selected="true">LP</button>
+      <button type="button" role="tab" id="tab-mech" aria-controls="panel-mech" aria-selected="false" tabindex="-1">仕組み</button>
+    </div>
+
+    <div role="tabpanel" id="panel-lp" aria-labelledby="tab-lp">
+      <h3 class="panel-title">LP</h3>
+      <div class="sites">
+        <article class="site">
+          <img src="assets/images/demo-crosstech.webp" width="1440" height="900" loading="lazy" decoding="async" alt="CROSSTECH ARCHITECTS のトップページ。暗い執務室の写真の上に「バックオフィスを、次世代のエンジンへ。」という見出しと、無料シミュレーション・相談のボタンが置かれている。">
+          <div>
+            <h4>株式会社クロステック・アーキテクツ（架空）</h4>
+            <p>中小企業向けの業務自動化コンサルを想定した BtoB サイト</p>
+            <dl><dt>見どころ</dt><dd>導入効果を試算するスライダー／GASと連携したフォーム／ダークモード</dd></dl>
+            <p><a href="https://wada3333.github.io/crosstech-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/crosstech-lp/</a></p>
+          </div>
+        </article>
+        <article class="site">
+          <img src="assets/images/demo-studio-core.webp" width="1440" height="900" loading="lazy" decoding="async" alt="STUDIO CORE のトップページ。明るい個室スタジオの写真の上に「続かなかった人が、続けている。」という見出しと、無料カウンセリングを予約するボタンが置かれている。">
+          <div>
+            <h4>STUDIO CORE（架空のパーソナルジム）</h4>
+            <p>申し込みまでの流れを重視した BtoC 向けLP</p>
+            <dl><dt>見どころ</dt><dd>予約フォームの空き枠表示／表示速度／計測イベントの設計</dd></dl>
+            <p><a href="https://wada3333.github.io/studio-core-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/studio-core-lp/</a></p>
+          </div>
+        </article>
+        <article class="site">
+          <img src="assets/images/demo-bloom.webp" width="1440" height="900" loading="lazy" decoding="async" alt="BLOOM（架空の美容室）のトップページ。レンガの壁の店内の写真の上に「あなたらしさが、咲く場所。」という見出しと、予約するボタンが置かれている。">
+          <div>
+            <h4>BLOOM（架空の美容室）</h4>
+            <p>予約までを4ステップにまとめた店舗LP</p>
+            <dl><dt>見どころ</dt><dd>4ステップ予約／Before・After スライダー</dd></dl>
+            <p><a href="https://wada3333.github.io/bloom-salon-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/bloom-salon-lp/</a></p>
+          </div>
+        </article>
       </div>
-      <div>
-        <h3>運用と設計</h3>
-        <p>Google Workspace管理 / ネットワーク構築 / 資産管理 / プロジェクト管理（PL歴8年）</p>
-      </div>
-      <div>
-        <h3>資格</h3>
-        <p>Tableau Data Saber / CompTIA Project+ / Microsoft Azure Fundamentals (AZ-900) / 工事担任者 AI・DD総合種 / 電気通信工事施工管理 / ビジネス統計スペシャリスト（エクセル分析 上級）/ 日商簿記2級</p>
+    </div>
+
+    <div role="tabpanel" id="panel-mech" aria-labelledby="tab-mech">
+      <h3 class="panel-title">仕組み</h3>
+      <div class="mech">
+        <article>
+          <h4>GAS勤怠管理</h4>
+          <p>打刻・有給申請・集計を1つにまとめた。36協定の上限を超えそうな人を前もって知らせ、給与の概算をメールで送る</p>
+          <ol class="flow"><li>打刻</li><li>有給申請と集計</li><li>36協定の超過を予測</li><li>給与の概算をメールで送る</li></ol>
+        </article>
+        <article>
+          <h4>売上・入金データの夜間自動突合</h4>
+          <p>夜のうちに売上データと入金データを突き合わせ、合わないものだけを一覧にする</p>
+          <ol class="flow"><li>売上データと入金データ</li><li>夜に自動で突き合わせ</li><li>合わないものだけ一覧に</li></ol>
+        </article>
+        <article>
+          <h4>問い合わせのAI判定 → Slack通知</h4>
+          <p>届いた問い合わせの内容をAIで分類し、担当のSlackへ知らせる</p>
+          <ol class="flow"><li>問い合わせが届く</li><li>AIで分類</li><li>担当のSlackへ通知</li></ol>
+          <p class="flow-note">n8n × Dify × Slack</p>
+        </article>
       </div>
     </div>
   </section>
 
+  <!-- 5 ランサーズのパッケージ -->
+  <section class="sec" id="packages" data-hide-for="cw">
+    <h2>ランサーズのパッケージ</h2>
+    <p class="sec-lead">内容と料金を決めてある定額のメニューです。ランサーズで購入できます。</p>
+    <ul class="pkgs">
+      <li class="pkg" id="pkg-line">
+        <img src="assets/images/pkg-line.webp" width="800" height="450" loading="lazy" decoding="async" alt="LINEに送るだけでシートへ自動転記するパッケージの表紙。現場の日報をシートへ自動で記録し、在庫数・発注依頼を一覧にまとめ、期限が近づいたら担当者へお知らせする。面談不要、15,000円〜。">
+        <h3>LINEに送るだけ！日報・在庫報告をスプレッドシートへ自動転記</h3>
+        <p class="price">15,000円〜</p>
+        <a class="btn btn--sub" href="https://www.lancers.jp/menu/detail/1334115" target="_blank" rel="noopener noreferrer">詳細を見る</a>
+      </li>
+      <li class="pkg" id="pkg-gas">
+        <img src="assets/images/pkg-gas.webp" width="800" height="450" loading="lazy" decoding="async" alt="スプレッドシートの転記・集計を自動化するパッケージの表紙。フォームの回答を担当者別に振り分け、毎朝の一覧をメールで送り、入力漏れのある行を色分けする。面談不要、10,000円〜。">
+        <h3>スプレッドシートの転記・集計・メール通知等をGASで自動化</h3>
+        <p class="price">10,000円〜</p>
+        <a class="btn btn--sub" href="https://www.lancers.jp/menu/detail/1334107" target="_blank" rel="noopener noreferrer">詳細を見る</a>
+      </li>
+      <li class="pkg" id="pkg-recon">
+        <img src="assets/images/pkg-recon.webp" width="800" height="450" loading="lazy" decoding="async" alt="入金消込を自動化するパッケージの表紙。銀行CSVと売上表を自動で突き合わせ、入金漏れ・金額ズレだけを一覧にする。面談不要でチャット完結、15,000円〜。">
+        <h3>入金消込（売上と入金の突合）をGASで自動化</h3>
+        <p class="price">15,000円〜</p>
+        <a class="btn btn--sub" href="https://www.lancers.jp/menu/detail/1336560" target="_blank" rel="noopener noreferrer">詳細を見る</a>
+      </li>
+      <li class="pkg" id="pkg-denchoho" hidden data-todo="要記入">
+        <img src="assets/images/pkg-denchoho.webp" width="800" height="450" loading="lazy" decoding="async" alt="請求書PDFの名前付け・フォルダ分けを自動化するパッケージの表紙。日付・取引先・金額の名前に自動で変更し、年月・取引先のフォルダへ振り分け、二重保存を検知する。15,000円〜、チャットのみ。">
+        <h3>請求書PDFを電帳法対応の名前に自動リネーム・整理</h3>
+        <p class="price">15,000円〜</p>
+        <a class="btn btn--sub" href="#" target="_blank" rel="noopener noreferrer" data-todo="要記入">詳細を見る</a>
+      </li>
+    </ul>
+  </section>
+
+  <!-- 6 頼めるか診断 -->
+  <section class="sec" id="check">
+    <h2>頼めるか診断</h2>
+    <p class="sec-lead">3つ答えると、受けられるかどうかと、どこから頼めばいいかが出ます。</p>
+
+    <div class="diag-live js-only">
+      <fieldset class="q" data-q="q1">
+        <legend>問1. 何を頼みたいですか</legend>
+        <div class="pick__opts">
+          <span class="opt"><input type="radio" name="q1" id="q1-list" value="list"><label for="q1-list">リストづくり・調べもの</label></span>
+          <span class="opt"><input type="radio" name="q1" id="q1-sheet" value="sheet"><label for="q1-sheet">Excel・スプレッドシートの表</label></span>
+          <span class="opt"><input type="radio" name="q1" id="q1-auto" value="auto"><label for="q1-auto">作業の自動化（GAS・LINE・メールなど）</label></span>
+          <span class="opt"><input type="radio" name="q1" id="q1-lp" value="lp"><label for="q1-lp">LP（ホームページ）</label></span>
+          <span class="opt"><input type="radio" name="q1" id="q1-tax" value="tax"><label for="q1-tax">確定申告の書類づくり・税務の相談</label></span>
+          <span class="opt"><input type="radio" name="q1" id="q1-other" value="other"><label for="q1-other">それ以外</label></span>
+        </div>
+      </fieldset>
+      <fieldset class="q" data-q="q2">
+        <legend>問2. やり取りの方法</legend>
+        <div class="pick__opts">
+          <span class="opt"><input type="radio" name="q2" id="q2-chat" value="chat"><label for="q2-chat">チャットだけで進めてよい</label></span>
+          <span class="opt"><input type="radio" name="q2" id="q2-call" value="call"><label for="q2-call">日中に通話や打ち合わせがほしい</label></span>
+          <span class="opt"><input type="radio" name="q2" id="q2-visit" value="visit"><label for="q2-visit">訪問してほしい</label></span>
+        </div>
+      </fieldset>
+      <fieldset class="q" data-q="q3" hidden>
+        <legend>問3. 近いものはどれですか</legend>
+        <div class="pick__opts">
+          <span class="opt"><input type="radio" name="q3" id="q3-line" value="line"><label for="q3-line">LINEで届く報告を表にまとめたい</label></span>
+          <span class="opt"><input type="radio" name="q3" id="q3-gas" value="gas"><label for="q3-gas">スプレッドシートの転記・集計・通知</label></span>
+          <span class="opt"><input type="radio" name="q3" id="q3-recon" value="recon"><label for="q3-recon">売上と入金の突き合わせ</label></span>
+          <span class="opt"><input type="radio" name="q3" id="q3-denchoho" value="denchoho"><label for="q3-denchoho">請求書PDFの名前付け・整理</label></span>
+          <span class="opt"><input type="radio" name="q3" id="q3-none" value="none"><label for="q3-none">どれにも当てはまらない</label></span>
+        </div>
+      </fieldset>
+
+      <div class="result-wrap" aria-live="polite">
+        <div class="result" data-result="pkg" hidden>
+          <p>この内容なら、ランサーズのパッケージで対応できます。</p>
+          <div data-slot></div>
+        </div>
+        <div class="result" data-result="consult" hidden>
+          <p>内容を伺ってから判断します。メッセージで、いまの手順を見せてください。</p>
+          <div class="btns">
+            <a class="btn" data-only="lc" href="https://www.lancers.jp/profile/sawada3333" target="_blank" rel="noopener noreferrer">ランサーズで相談する</a>
+            <a class="btn" data-only="cw" href="https://crowdworks.jp/public/employees/7046598" target="_blank" rel="noopener noreferrer">クラウドワークスで相談する</a>
+          </div>
+        </div>
+        <div class="result" data-result="ng-a" hidden>
+          <p>すみません、この条件ではお受けできません。日中の通話・打ち合わせや訪問には対応していません（対応は平日21時以降と土日祝、チャットのみです）。</p>
+        </div>
+        <div class="result" data-result="ng-b" hidden>
+          <p>※税務相談や申告書の作成代行は行っていません。確定申告に向けた記帳・集計のしくみ（Excel管理表など）づくりを担当します。</p>
+          <p>表づくりなら相談できます。</p>
+          <div class="btns">
+            <a class="btn" data-only="lc" href="https://www.lancers.jp/profile/sawada3333" target="_blank" rel="noopener noreferrer">ランサーズで相談する</a>
+            <a class="btn" data-only="cw" href="https://crowdworks.jp/public/employees/7046598" target="_blank" rel="noopener noreferrer">クラウドワークスで相談する</a>
+          </div>
+        </div>
+      </div>
+      <p class="demo-actions"><button type="button" class="btn btn--sub" data-act="diag-reset">やり直す</button></p>
+    </div>
+
+    <div class="diag-static static-only">
+      <table>
+        <caption class="sr">判定の表</caption>
+        <thead><tr><th scope="col">条件</th><th scope="col">結果</th></tr></thead>
+        <tbody>
+          <tr><td>日中の通話や打ち合わせ、または訪問がほしい</td><td>条件が合いません</td></tr>
+          <tr><td>確定申告の書類づくり・税務の相談</td><td>条件が合いません</td></tr>
+          <tr><td>作業の自動化で、LINEの報告・スプレッドシートの転記集計通知・売上と入金の突き合わせ・請求書PDFの整理のいずれか</td><td>対応できます。該当するランサーズのパッケージ</td></tr>
+          <tr><td>それ以外</td><td>メッセージで相談</td></tr>
+        </tbody>
+      </table>
+      <div class="result"><p>この内容なら、ランサーズのパッケージで対応できます。</p></div>
+      <div class="result"><p>内容を伺ってから判断します。メッセージで、いまの手順を見せてください。</p></div>
+      <div class="result"><p>すみません、この条件ではお受けできません。日中の通話・打ち合わせや訪問には対応していません（対応は平日21時以降と土日祝、チャットのみです）。</p></div>
+      <div class="result"><p>※税務相談や申告書の作成代行は行っていません。確定申告に向けた記帳・集計のしくみ（Excel管理表など）づくりを担当します。</p><p>表づくりなら相談できます。</p></div>
+    </div>
+  </section>
+
+  <!-- 7 進め方・資格・依頼先 -->
   <section class="sec" id="flow">
     <h2>進め方</h2>
     <ol class="steps">
-      <li class="step">
-        <h3>相談</h3>
-        <p>現在の手順を、実際の画面やファイルで見せてください。文章の説明より速く正確に把握できます。</p>
-      </li>
-      <li class="step">
-        <h3>範囲を決める</h3>
-        <p>できること・できないこと・想定作業時間をこちらから提示します。ここで折り合わなければ辞退します。</p>
-      </li>
-      <li class="step">
-        <h3>作る</h3>
-        <p>進捗は区切りごとにチャットで共有します。動くものを早めに見せる進め方をとります。</p>
-      </li>
-      <li class="step">
-        <h3>確認</h3>
-        <p>実データで動かして確認していただきます。修正はこの段階に含みます。</p>
-      </li>
-      <li class="step">
-        <h3>引き渡し</h3>
-        <p>操作手順と、壊れたときの対処をドキュメントで渡します。</p>
-      </li>
+      <li class="step"><h3>相談</h3><p>現在の手順を、実際の画面やファイルで見せてください。文章の説明より速く正確に把握できます。</p></li>
+      <li class="step"><h3>範囲を決める</h3><p>できること・できないこと・想定作業時間をこちらから提示します。ここで折り合わなければ辞退します。</p></li>
+      <li class="step"><h3>作る</h3><p>進捗は区切りごとにチャットで共有します。動くものを早めに見せる進め方をとります。</p></li>
+      <li class="step"><h3>確認</h3><p>実データで動かして確認していただきます。修正はこの段階に含みます。</p></li>
+      <li class="step"><h3>引き渡し</h3><p>操作手順と、壊れたときの対処をドキュメントで渡します。</p></li>
     </ol>
+  </section>
+
+  <section class="sec" id="quals">
+    <h2>資格</h2>
+    <ul class="quals">
+      <li>日商簿記2級</li>
+      <li>ビジネス統計スペシャリスト（エクセル分析スペシャリスト）</li>
+      <li>Tableau Data Saber</li>
+      <li>CompTIA Project+</li>
+      <li>Microsoft Azure Fundamentals（AZ-900）</li>
+      <li>工事担任者 AI・DD総合種</li>
+    </ul>
   </section>
 
   <section class="sec" id="contact">
@@ -428,10 +914,10 @@ h1,h2,h3{font-feature-settings:"palt" 1;font-weight:700;word-break:auto-phrase}
     <div class="cta">
       <p>何を自動化できるか決まっていない段階でも構いません。いまの手順を見せていただければ、そもそも自動化すべきかどうかから一緒に判断します。</p>
       <div class="btns">
-        <a class="btn" href="https://www.lancers.jp/profile/sawada3333" target="_blank" rel="noopener noreferrer">ランサーズで相談する</a>
-        <a class="btn" href="https://crowdworks.jp/public/employees/7046598" target="_blank" rel="noopener noreferrer">クラウドワークスで相談する</a>
+        <a class="btn" data-only="lc" href="https://www.lancers.jp/profile/sawada3333" target="_blank" rel="noopener noreferrer">ランサーズで相談する</a>
+        <a class="btn" data-only="cw" href="https://crowdworks.jp/public/employees/7046598" target="_blank" rel="noopener noreferrer">クラウドワークスで相談する</a>
       </div>
-      <p class="btn-note">平日夜間・土日に対応します。チャットでのやり取りのみです。</p>
+      <p class="btn-note">平日21時以降と土日祝に対応します。チャットでのやり取りのみです。</p>
     </div>
   </section>
 
@@ -444,5 +930,7 @@ h1,h2,h3{font-feature-settings:"palt" 1;font-weight:700;word-break:auto-phrase}
     <a href="https://github.com/wada3333" target="_blank" rel="noopener noreferrer">https://github.com/wada3333</a>
   </div>
 </footer>
+
+<script type="module" src="assets/js/app.js"></script>
 </body>
 </html>

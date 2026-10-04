@@ -83,3 +83,9 @@ const notices = [
 ].join('\n');
 writeFileSync(join(OUT, 'OFL.txt'), notices + '\n', 'utf8');
 console.log('\nassets/fonts/OFL.txt を書き出しました');
+
+// どの字を入れたかを記録しておく（公開はしない）。tools/check.mjs が「ページの字がすべて
+// サブセットに入っているか」を、この一覧と突き合わせて確かめる。
+const textParam = new URL(cssUrl).searchParams.get('text') || '';
+writeFileSync(join(OUT, 'charset.txt'), [...new Set(textParam)].sort().join('') + '\n', 'utf8');
+console.log(`assets/fonts/charset.txt を書き出しました（${new Set(textParam).size}字）`);
