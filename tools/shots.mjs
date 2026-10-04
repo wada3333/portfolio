@@ -86,10 +86,29 @@ try {
       const shown = await evaluate("document.documentElement.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')");
       const screens = Math.ceil(pageH / vp.height);
       for (let s = 0; s < screens; s++) {
-        await evaluate(`scrollTo(0, ${s * vp.height}); 1`);
+        await evaluate(`scrollTo({ top: ${s * vp.height}, behavior: 'instant' }); 1`);
         await sleep(450); // 遅延読み込みの画像と、導線の色の変化を待つ
         const shot = await send('Page.captureScreenshot', { format: 'webp', quality: 80 });
         writeFileSync(join(dir, `${String(s + 1).padStart(2, '0')}.webp`), Buffer.from(shot.result.data, 'base64'));
+      }
+      // 操作したあとの状態（デモの実行後、診断の結果、仕組みタブ）。ページを読み込み直さず続けて撮る
+      const STATES = [
+        ['gas', '#demo-gas', `document.querySelector('#demo-gas [data-act=run]').click()`, 4200],
+        ['list', '#demo-list', `document.querySelector('#demo-list [data-act=unify]').click(); document.querySelector('#demo-list [data-act=dedupe]').click()`, 1200],
+        ['sheet', '#demo-sheet', `(() => { const d = document.querySelector('#demo-sheet'); d.querySelector('[data-f=month]').value = '7'; d.querySelector('[data-f=kind]').value = 'ex'; d.querySelector('[data-f=amount]').value = '30000'; d.querySelector('[data-act=add]').click(); })()`, 400],
+        ['mech', '#makes', `document.getElementById('tab-mech').click()`, 400],
+        ['diag-pkg', '#check', `(() => { for (const [n, v] of [['q1','auto'],['q2','chat'],['q3','gas']]) { const e = document.querySelector('input[name=' + n + '][value=' + v + ']'); e.checked = true; e.dispatchEvent(new Event('change', { bubbles: true })); } })()`, 500],
+        ['diag-tax', '#check', `(() => { document.querySelector('[data-act=diag-reset]').click(); for (const [n, v] of [['q1','tax'],['q2','chat']]) { const e = document.querySelector('input[name=' + n + '][value=' + v + ']'); e.checked = true; e.dispatchEvent(new Event('change', { bubbles: true })); } })()`, 500]
+      ];
+      if (!process.env.SHOTS_NO_STATES) {
+        for (const [name, sel, action, wait] of STATES) {
+          await evaluate(`${action}; 1`);
+          await sleep(wait);
+          await evaluate(`(() => { const el = document.querySelector('${sel}'); const r = el.getBoundingClientRect(); scrollTo({ top: scrollY + r.top - 70, behavior: 'instant' }); })(); 1`);
+          await sleep(500);
+          const shot = await send('Page.captureScreenshot', { format: 'webp', quality: 80 });
+          writeFileSync(join(dir, `state-${name}.webp`), Buffer.from(shot.result.data, 'base64'));
+        }
       }
       console.log(`${tag.padEnd(13)} 全高 ${String(pageH).padStart(5)}px / ${screens}枚 / 表示テーマ ${shown} / ` +
         (overflow.sw > overflow.iw ? `横スクロールあり(${overflow.sw}>${overflow.iw})` : '横スクロールなし'));

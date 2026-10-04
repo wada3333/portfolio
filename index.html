@@ -274,7 +274,6 @@ html.js .static-only{display:none}
 .tbl th,.tbl td{padding:.4rem .6rem;border:1px solid color-mix(in srgb,var(--line) 35%,var(--paper));text-align:left;vertical-align:top}
 .tbl thead th,.tbl tfoot th,.tbl tfoot td{background:var(--paper-deep)}
 .tbl td.num,.tbl th.num{text-align:right;white-space:nowrap}
-.list td:last-child{white-space:nowrap}
 .tbl tr.is-doomed td{opacity:.55;text-decoration:line-through}
 .tbl td.is-changed{box-shadow:inset 3px 0 0 var(--terminal);background:color-mix(in srgb,var(--terminal) 16%,transparent)}
 .demo-actions{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.9rem}
@@ -562,33 +561,33 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
           <div class="tbl">
             <table class="list list-live">
               <caption><span class="static-only">整形前の</span>店舗リスト（10行）</caption>
-              <thead><tr><th scope="col">店名</th><th scope="col">区分</th><th scope="col">電話番号</th></tr></thead>
+              <thead><tr><th scope="col">店名</th><th scope="col">区分</th><th scope="col">フロア</th></tr></thead>
               <tbody>
-                <tr><td data-fixed="株式会社みどり薬局">（株）みどり薬局</td><td>薬局</td><td>03-0000-0001</td></tr>
-                <tr><td>株式会社みどり薬局</td><td>薬局</td><td>03-0000-0001</td></tr>
-                <tr><td>星読みサロン ルナ</td><td>占い</td><td>03-0000-0002</td></tr>
-                <tr><td>星読みサロン ルナ</td><td>占い</td><td data-fixed="03-0000-0002">０３-００００-０００２</td></tr>
-                <tr><td>ほぐし処 やすらぎ</td><td>マッサージ</td><td>03-0000-0003</td></tr>
-                <tr><td data-fixed="株式会社ひなた化粧品">（株）ひなた化粧品</td><td>化粧品</td><td data-fixed="03-0000-0004">０３-００００-０００４</td></tr>
-                <tr><td>株式会社あおぞら雑貨</td><td>雑貨</td><td>03-0000-0005</td></tr>
-                <tr><td>ほぐし処 やすらぎ</td><td>マッサージ</td><td>03-0000-0003</td></tr>
-                <tr><td data-fixed="株式会社さくら調剤">（株）さくら調剤</td><td>薬局</td><td>03-0000-0006</td></tr>
-                <tr><td>美容サロン コスモス</td><td>美容</td><td data-fixed="03-0000-0007">０３-００００-０００７</td></tr>
+                <tr><td data-fixed="株式会社みどり薬局">（株）みどり薬局</td><td>薬局</td><td>1F</td></tr>
+                <tr><td>株式会社みどり薬局</td><td>薬局</td><td>1F</td></tr>
+                <tr><td>星読みサロン ルナ</td><td>占い</td><td>3F</td></tr>
+                <tr><td>星読みサロン ルナ</td><td>占い</td><td data-fixed="3F">３F</td></tr>
+                <tr><td>ほぐし処 やすらぎ</td><td>マッサージ</td><td>2F</td></tr>
+                <tr><td data-fixed="株式会社ひなた化粧品">（株）ひなた化粧品</td><td>化粧品</td><td data-fixed="2F">２F</td></tr>
+                <tr><td>株式会社あおぞら雑貨</td><td>雑貨</td><td>1F</td></tr>
+                <tr><td>ほぐし処 やすらぎ</td><td>マッサージ</td><td>2F</td></tr>
+                <tr><td data-fixed="株式会社さくら調剤">（株）さくら調剤</td><td>薬局</td><td>1F</td></tr>
+                <tr><td>美容サロン コスモス</td><td>美容</td><td data-fixed="4F">４F</td></tr>
               </tbody>
             </table>
           </div>
           <div class="tbl static-only">
             <table class="list">
               <caption>整形後の店舗リスト（表記をそろえ、重複を消した7行）</caption>
-              <thead><tr><th scope="col">店名</th><th scope="col">区分</th><th scope="col">電話番号</th></tr></thead>
+              <thead><tr><th scope="col">店名</th><th scope="col">区分</th><th scope="col">フロア</th></tr></thead>
               <tbody>
-                <tr><td>株式会社みどり薬局</td><td>薬局</td><td>03-0000-0001</td></tr>
-                <tr><td>星読みサロン ルナ</td><td>占い</td><td>03-0000-0002</td></tr>
-                <tr><td>ほぐし処 やすらぎ</td><td>マッサージ</td><td>03-0000-0003</td></tr>
-                <tr><td>株式会社ひなた化粧品</td><td>化粧品</td><td>03-0000-0004</td></tr>
-                <tr><td>株式会社あおぞら雑貨</td><td>雑貨</td><td>03-0000-0005</td></tr>
-                <tr><td>株式会社さくら調剤</td><td>薬局</td><td>03-0000-0006</td></tr>
-                <tr><td>美容サロン コスモス</td><td>美容</td><td>03-0000-0007</td></tr>
+                <tr><td>株式会社みどり薬局</td><td>薬局</td><td>1F</td></tr>
+                <tr><td>星読みサロン ルナ</td><td>占い</td><td>3F</td></tr>
+                <tr><td>ほぐし処 やすらぎ</td><td>マッサージ</td><td>2F</td></tr>
+                <tr><td>株式会社ひなた化粧品</td><td>化粧品</td><td>2F</td></tr>
+                <tr><td>株式会社あおぞら雑貨</td><td>雑貨</td><td>1F</td></tr>
+                <tr><td>株式会社さくら調剤</td><td>薬局</td><td>1F</td></tr>
+                <tr><td>美容サロン コスモス</td><td>美容</td><td>4F</td></tr>
               </tbody>
             </table>
           </div>

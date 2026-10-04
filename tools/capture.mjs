@@ -196,9 +196,9 @@ body{width:1200px;height:630px;background:var(--paper);color:var(--ink);position
 </style></head><body>
 <img class="bg" src="${bg}" alt="">
 <div class="txt">
-  <p class="head"><span class="cl"><span class="u">手で繰り返している</span><span class="u">工程を、</span></span><span class="cl"><span class="u">1本の線に</span><span class="u">置き換えます。</span></span></p>
+  <p class="head"><span class="cl"><span class="u">手で繰り返している</span><span class="u">作業を、</span></span><span class="cl"><span class="u">自動で回る</span><span class="u">仕組みにします。</span></span></p>
   <p class="name">wada3333</p>
-  <p class="role">業務自動化 / Google Workspace / Web制作</p>
+  <p class="role">リスト作成 / 管理表 / 業務の自動化 / LP制作</p>
 </div>
 </body></html>`;
 }
