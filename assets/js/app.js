@@ -230,10 +230,16 @@ function initDiag() {
   const q3 = $('[data-q="q3"]', diag);
   const results = $$('[data-result]', diag);
   const slot = $('[data-result="pkg"] [data-slot]', diag);
-  const cards = { line: '#pkg-line', gas: '#pkg-gas', recon: '#pkg-recon', denchoho: '#pkg-denchoho' };
+  // 問1（list・sheet）は問1だけで、問1が auto のときは問3でカードが決まる。1つの答えに複数のカードを出せる
+  const cards = {
+    list: ['#pkg-facility', '#pkg-research'],
+    sheet: ['#pkg-excel'],
+    line: ['#pkg-line'], gas: ['#pkg-gas'], recon: ['#pkg-recon'], denchoho: ['#pkg-denchoho'],
+  };
 
   // 表に出ていないカード（パッケージ欄ごと隠れている / URL 未設定で hidden）は「出せる」と数えない
   const available = (card) => Boolean(card) && !card.hidden && card.offsetParent !== null;
+  const shown = (pick) => (cards[pick] || []).map((sel) => $(sel)).filter(available);
 
   const update = () => {
     const a = value('q1');
@@ -241,20 +247,22 @@ function initDiag() {
     if (a !== 'auto') for (const el of $$('input[name="q3"]', diag)) el.checked = false;
     q3.hidden = a !== 'auto';
     const c = value('q3');
+    const pick = a === 'auto' ? c : a;
 
     let key = '';
     if (a && b) {
       if (b === 'call' || b === 'visit') key = 'ng-a';
       else if (a === 'tax') key = 'ng-b';
-      else if (a === 'auto') {
-        if (c) key = cards[c] && available($(cards[c])) ? 'pkg' : 'consult';
-      } else key = 'consult';
+      else if (a === 'auto' && !c) key = '';
+      else key = shown(pick).length ? 'pkg' : 'consult';
     }
 
     if (key === 'pkg') {
-      const clone = $(cards[c]).cloneNode(true);
-      clone.removeAttribute('id');
-      slot.replaceChildren(clone);
+      slot.replaceChildren(...shown(pick).map((card) => {
+        const clone = card.cloneNode(true);
+        clone.removeAttribute('id');
+        return clone;
+      }));
     }
     for (const r of results) r.hidden = r.dataset.result !== key;
   };
