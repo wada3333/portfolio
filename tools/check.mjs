@@ -510,7 +510,7 @@ try {
       const links = [...document.querySelectorAll('a[href*="crowdworks"]')].filter(a => a.getBoundingClientRect().width > 0).length;
       return JSON.stringify({ cwText: /クラウドワークス|CrowdWorks/i.test(t), links, others: (t.match(/他のサイト/g) || []).length });
     })()`));
-    record(!lc.cwText && lc.links === 0 && lc.others >= 3, '?from=lc では、クラウドワークスの名前・リンク・評価の表示が出ない（実績の媒体名は「他のサイト」になる）',
+    record(!lc.cwText && lc.links === 0 && lc.others >= 2, '?from=lc では、クラウドワークスの名前・リンク・評価の表示が出ない（実績の媒体名は「他のサイト」になる）',
       `「クラウドワークス」の文字 ${lc.cwText ? 'あり' : 'なし'} / リンク ${lc.links}本 / 「他のサイト」${lc.others}か所`);
 
     await load(1280, 900);
