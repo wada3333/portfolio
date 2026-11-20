@@ -238,8 +238,8 @@ html.js .static-only{display:none}
 
 /* --- 実績 -------------------------------------------------------------- */
 .cases{margin-top:2.25rem;display:grid;gap:var(--case-gap)}
-.chain{display:grid;gap:var(--case-gap)}
-.chain-note{font-size:var(--fs-small);color:var(--mute);margin-bottom:calc(var(--case-gap) * -.45)}
+.chain{display:grid;gap:var(--case-gap);margin-top:calc(var(--case-gap) * .4);padding-top:1.1rem;border-top:1px solid color-mix(in srgb,var(--line) 45%,var(--paper))}
+.chain-note{font-size:var(--fs-small);font-weight:700;margin-bottom:calc(var(--case-gap) * -.45)}
 .case{position:relative;padding-top:1.1rem}
 .case h3{position:relative;font-size:var(--fs-h3);line-height:1.5}
 .case h3::before{content:"";position:absolute;left:calc(-1*var(--rail-x));top:.75em;width:calc(var(--rail-x) - 14px);border-top:1px solid var(--line)}
@@ -519,7 +519,7 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
       </article>
 
       <div class="chain" role="group" aria-labelledby="chain-note">
-        <p class="chain-note" id="chain-note">同じ会社から続けて5回のご依頼</p>
+        <p class="chain-note" id="chain-note">以下の5件は、同じ会社から続けてのご依頼です</p>
         <article class="case">
           <h3>商業施設の店舗リスト（29拠点・171店舗）</h3>
           <p class="case__meta"><span>ランサーズ</span> <span>法人</span> <span class="chip">満足</span></p>
