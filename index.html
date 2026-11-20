@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>wada3333｜リスト作成 / 管理表 / 業務の自動化 / LP制作</title>
+<title>wada3333｜リスト作成 / 管理表 / 業務の自動化</title>
 <meta name="description" content="手で繰り返している作業を、自動で回る仕組みにします。平日は21時以降と、土日祝に対応しています。やり取りはチャットのみで、通話・訪問は行いません。">
 <link rel="canonical" href="https://wada3333.github.io/portfolio/">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
@@ -12,15 +12,15 @@
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="wada3333">
-<meta property="og:title" content="wada3333｜リスト作成 / 管理表 / 業務の自動化 / LP制作">
+<meta property="og:title" content="wada3333｜リスト作成 / 管理表 / 業務の自動化">
 <meta property="og:description" content="手で繰り返している作業を、自動で回る仕組みにします。平日は21時以降と、土日祝に対応しています。やり取りはチャットのみで、通話・訪問は行いません。">
 <meta property="og:url" content="https://wada3333.github.io/portfolio/">
-<meta property="og:image" content="https://wada3333.github.io/portfolio/assets/og.png?v=3">
+<meta property="og:image" content="https://wada3333.github.io/portfolio/assets/og.png?v=4">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="wada3333｜リスト作成 / 管理表 / 業務の自動化 / LP制作">
+<meta name="twitter:title" content="wada3333｜リスト作成 / 管理表 / 業務の自動化">
 <meta name="twitter:description" content="手で繰り返している作業を、自動で回る仕組みにします。平日は21時以降と、土日祝に対応しています。やり取りはチャットのみで、通話・訪問は行いません。">
-<meta name="twitter:image" content="https://wada3333.github.io/portfolio/assets/og.png?v=3">
+<meta name="twitter:image" content="https://wada3333.github.io/portfolio/assets/og.png?v=4">
 
 <!-- 描画前に決めること: 明るさ（ダークモード）と、どこから来たか（?from=lc / ?from=cw）。
      描画後に切り替えると、一瞬だけ違う表示が見えてしまうので <head> で済ませる。
@@ -123,7 +123,9 @@ html.js .static-only{display:none}
 /* --- LC・CW への導線の出し分け（§7）------------------------------------- */
 :root[data-channel="lc"] [data-only="cw"],
 :root[data-channel="cw"] [data-only="lc"],
-:root[data-channel="cw"] [data-hide-for="cw"]{display:none!important}
+:root[data-channel="cw"] [data-hide-for="cw"],
+:root[data-channel="lc"] [data-hide-for="lc"],
+:root:not([data-channel="lc"]) [data-lc-only]{display:none!important}
 
 /* --- ボタン ------------------------------------------------------------ */
 .btn{
@@ -252,6 +254,9 @@ html.js .static-only{display:none}
 .case dt{color:var(--mute)}
 .case dd{margin:0}
 .quote{display:block}
+.shot{margin-top:1rem;max-width:calc(var(--measure) + 6.5em)}
+.shot img{width:100%;border:1px solid var(--paper-deep);background:#fff}
+.shot figcaption{margin-top:.4rem;font-size:var(--fs-small);line-height:1.7;color:var(--mute)}
 .note{max-width:var(--measure);margin-top:.9rem;padding-left:.9rem;border-left:2px solid var(--line);font-size:var(--fs-small);line-height:1.75}
 
 /* --- できること -------------------------------------------------------- */
@@ -292,9 +297,9 @@ html.js .gas-ng.on{display:table-row}
 .gas-done{margin-top:.7rem;font-size:var(--fs-small);line-height:1.7;font-weight:700}
 html.js .gas-done [data-done]{display:none}
 html.js .gas-done [data-done].on{display:inline}
-/* タブ: JS が動くとき、開いているパネルだけ出す（mech は初期状態で閉じる）*/
-html.js #panel-mech:not(.is-open){display:none}
-html.js #panel-lp.is-closed{display:none}
+/* タブ: JS が動くとき、開いているパネルだけ出す（仕組みは初期状態で開く、フォーム・予約画面の見本は初期状態で閉じる）*/
+html.js #panel-lp:not(.is-open){display:none}
+html.js #panel-mech.is-closed{display:none}
 
 /* --- 自主制作 ---------------------------------------------------------- */
 .tabs{display:flex;gap:.25rem;margin-top:1.75rem;border-bottom:1px solid var(--line)}
@@ -416,7 +421,7 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
   <div class="head__in">
     <div>
       <span class="head__name">wada3333</span>
-      <span class="head__role">リスト作成 / 管理表 / 業務の自動化 / LP制作</span>
+      <span class="head__role">リスト作成 / 管理表 / 業務の自動化</span>
     </div>
     <div class="head__right">
       <span class="status">受付中</span>
@@ -476,8 +481,8 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
     </div>
 
     <dl class="stats">
-      <div><dt>ランサーズ 満足</dt><dd><span class="stat">4</span>件<small>うち3件は、同じ会社から続けてのご依頼</small></dd></div>
-      <div><dt>クラウドワークス評価</dt><dd><span class="stat">5.0</span>（2件）</dd></div>
+      <div><dt>ランサーズ 満足</dt><dd><span class="stat">7</span>件<small>うち5件は、同じ会社から続けてのご依頼</small></dd></div>
+      <div data-only="cw"><dt>クラウドワークス評価</dt><dd><span class="stat">5.0</span>（7件）</dd></div>
     </dl>
 
     <p class="terms">平日は21時以降と、土日祝に対応しています。やり取りはチャットのみで、通話・訪問は行いません。</p>
@@ -486,11 +491,25 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
   <!-- 2 実績 -->
   <section class="sec" id="works">
     <h2>実績</h2>
-    <p class="sec-lead">ランサーズとクラウドワークスで受けた案件です。社名は伏せています。</p>
+    <p class="sec-lead">ランサーズ<span data-hide-for="lc">とクラウドワークス</span><span data-lc-only>など</span>で受けた案件です。社名は伏せています。</p>
     <div class="cases">
       <article class="case">
+        <h3>学習塾のリスト作成（指定エリア・計1,200件）</h3>
+        <p class="case__meta"><span><span data-hide-for="lc">クラウドワークス</span><span data-lc-only>他のサイト</span></span> <span>同じクライアントから3回の継続</span> <span class="chip">計1,200件</span></p>
+        <dl>
+          <dt>課題</dt><dd>指定エリアの学習塾を、決めた条件に合うものだけ、Excelのリストにしたい</dd>
+          <dt>対応</dt><dd>検索とポータルサイトの一覧からエリア内の塾を洗い出し、大手FC・オンライン専門・幼児や小学生のみ・公設塾・閉塾などは、決めたルールで外した。手元のリストや過去の納品分との重複も照合した。住所や電話番号をHP以外から取ったときは備考に取得元を書き、代表者名はHPに書かれているときだけ記載した。判断に迷う塾はまとめて確認し、いただいた答えは次の回から基準に加えた。収集と照合はAIと自作のスクリプトで自動化し、納品前に抜き取りで見直した</dd>
+          <dt>結果</dt><dd>1回400件を3回、計1,200件をExcelで納品。1回目・2回目は、納期より2週間以上早く納品した</dd>
+        </dl>
+        <figure class="shot">
+          <img src="assets/images/case-juku-sample.webp" width="1400" height="1095" loading="lazy" decoding="async" alt="学習塾リストの納品Excelの見本。No、塾名、塾長（代表者）名、郵便番号・住所、電話番号、ホームページURL、塾の強みや特徴、備考の列に、架空の塾6件が並んでいる。">
+          <figcaption>納品Excelの見本です。塾名・氏名・住所・電話番号・URLはすべて架空のデータです。</figcaption>
+        </figure>
+      </article>
+
+      <article class="case">
         <h3>確定申告用の不動産収支 Excel 管理表</h3>
-        <p class="case__meta"><span>クラウドワークス</span> <span>個人の収益物件オーナー様</span> <span class="chip">評価5.0</span></p>
+        <p class="case__meta"><span><span data-hide-for="lc">クラウドワークス</span><span data-lc-only>他のサイト</span></span> <span>個人の収益物件オーナー様</span> <span class="chip">評価5.0</span></p>
         <dl>
           <dt>課題</dt><dd>家賃と経費を、確定申告に使える形で管理したい</dd>
           <dt>対応</dt><dd>家賃・経費を1行ずつ入力するだけで、物件別・月別・年間の集計と減価償却を自動で計算する Excel を作成。物件3件と、白色・青色の両方の申告に対応し、使い方のシートを分けて納品した。納品後の修正依頼（科目プルダウンの並び替え、見出しの色の変更）にも対応</dd>
@@ -499,8 +518,17 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
         <p class="note">※税務相談や申告書の作成代行は行っていません。確定申告に向けた記帳・集計のしくみ（Excel管理表など）づくりを担当します。</p>
       </article>
 
+      <article class="case">
+        <h3>社内データの整理</h3>
+        <p class="case__meta"><span><span data-hide-for="lc">クラウドワークス</span><span data-lc-only>他のサイト</span></span> <span>法人</span> <span class="chip">評価5.0</span></p>
+        <dl>
+          <dt>課題</dt><dd>社内で1か月悩んでいたデータの整理を、終わらせたい</dd>
+          <dt>結果</dt><dd>評価5.0（全項目満点）。<span class="quote">「弊社の社員が1ヶ月どうしようか悩んでいたデータ整理を1日で解決していただき感謝しきれません。」</span></dd>
+        </dl>
+      </article>
+
       <div class="chain" role="group" aria-labelledby="chain-note">
-        <p class="chain-note" id="chain-note">同じ会社から続けて3回のご依頼</p>
+        <p class="chain-note" id="chain-note">同じ会社から続けて5回のご依頼</p>
         <article class="case">
           <h3>商業施設の店舗リスト（29拠点・171店舗）</h3>
           <p class="case__meta"><span>ランサーズ</span> <span>法人</span> <span class="chip">満足</span></p>
@@ -529,7 +557,24 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
             <dt>結果</dt><dd>満足評価。<span class="quote">「本番まで伴走までして頂き本当にありがとうございました」</span><span class="quote">「非常に頼もしいランサーさんです。」</span></dd>
           </dl>
         </article>
+        <article class="case">
+          <h3>続けてのご依頼（4回目・5回目）</h3>
+          <p class="case__meta"><span>ランサーズ</span> <span>店舗リストと同じ会社</span> <span class="chip">満足</span></p>
+          <dl>
+            <dt>結果</dt><dd>どちらも満足評価。<span class="quote">「いつもクライアントに沿って動いて頂きありがとうございます」</span><span class="quote">「迅速に的確に作成頂きありがとうございます」</span></dd>
+          </dl>
+        </article>
       </div>
+
+      <article class="case">
+        <h3>メーカーの営業リスト作成</h3>
+        <p class="case__meta"><span>ランサーズ</span> <span>トライアル</span> <span class="chip">満足</span></p>
+        <dl>
+          <dt>課題</dt><dd>Amazonの商品ページから、メーカーを特定して営業リストにしたい</dd>
+          <dt>対応</dt><dd>お預かりしたマニュアルに沿って、商品ページからメーカーを特定し、一覧に入力した。進み具合もこまめに報告した</dd>
+          <dt>結果</dt><dd>満足評価。<span class="quote">「想像以上のスピードで作業を完了していただきました。」</span><span class="quote">「入力内容も非常に正確かつ丁寧で、報告も細やかでした。」</span></dd>
+        </dl>
+      </article>
 
       <article class="case">
         <h3>海外展開に向けた電子部材の調査</h3>
@@ -711,54 +756,16 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
       </div>
     </div>
 
-    <div class="pillar">
-      <h3>LP制作</h3>
-      <p>フォームから送られた内容をスプレッドシートに記録し、通知まで行うLPを作ります。このページも、その作り方の見本として作っています。</p>
-      <p><a class="btn btn--sub" href="#makes" data-open-tab="lp">自主制作のLPを見る</a></p>
-    </div>
   </section>
 
   <!-- 4 自主制作 -->
   <section class="sec" id="makes">
     <h2>自主制作</h2>
-    <p class="sec-lead">架空の会社やお店、社内の仕組みを想定して作ったものです。実際の案件ではありません。</p>
+    <p class="sec-lead">架空の会社やお店、社内の仕組みを想定して作ったものです。実際の案件ではありません。フォームや予約画面の見本も置いています。</p>
 
     <div class="tabs js-only" role="tablist" aria-label="自主制作の種類">
-      <button type="button" role="tab" id="tab-lp" aria-controls="panel-lp" aria-selected="true">LP</button>
-      <button type="button" role="tab" id="tab-mech" aria-controls="panel-mech" aria-selected="false" tabindex="-1">仕組み</button>
-    </div>
-
-    <div role="tabpanel" id="panel-lp" aria-labelledby="tab-lp">
-      <h3 class="panel-title">LP</h3>
-      <div class="sites">
-        <article class="site">
-          <img src="assets/images/demo-crosstech.webp" width="1440" height="900" loading="lazy" decoding="async" alt="CROSSTECH ARCHITECTS のトップページ。暗い執務室の写真の上に「バックオフィスを、次世代のエンジンへ。」という見出しと、無料シミュレーション・相談のボタンが置かれている。">
-          <div>
-            <h4>株式会社クロステック・アーキテクツ<span class="nw">（架空）</span></h4>
-            <p>中小企業向けの業務自動化コンサルを想定した BtoB サイト</p>
-            <dl><dt>見どころ</dt><dd>導入効果を試算するスライダー／GASと連携したフォーム／ダークモード</dd></dl>
-            <p><a href="https://wada3333.github.io/crosstech-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/crosstech-lp/</a></p>
-          </div>
-        </article>
-        <article class="site">
-          <img src="assets/images/demo-studio-core.webp" width="1440" height="900" loading="lazy" decoding="async" alt="STUDIO CORE のトップページ。明るい個室スタジオの写真の上に「続かなかった人が、続けている。」という見出しと、無料カウンセリングを予約するボタンが置かれている。">
-          <div>
-            <h4>STUDIO CORE<span class="nw">（架空のパーソナルジム）</span></h4>
-            <p>申し込みまでの流れを重視した BtoC 向けLP</p>
-            <dl><dt>見どころ</dt><dd>予約フォームの空き枠表示／表示速度／計測イベントの設計</dd></dl>
-            <p><a href="https://wada3333.github.io/studio-core-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/studio-core-lp/</a></p>
-          </div>
-        </article>
-        <article class="site">
-          <img src="assets/images/demo-bloom.webp" width="1440" height="900" loading="lazy" decoding="async" alt="BLOOM（架空の美容室）のトップページ。レンガの壁の店内の写真の上に「あなたらしさが、咲く場所。」という見出しと、予約するボタンが置かれている。">
-          <div>
-            <h4>BLOOM<span class="nw">（架空の美容室）</span></h4>
-            <p>予約までを4ステップにまとめた店舗LP</p>
-            <dl><dt>見どころ</dt><dd>4ステップ予約／Before・After スライダー</dd></dl>
-            <p><a href="https://wada3333.github.io/bloom-salon-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/bloom-salon-lp/</a></p>
-          </div>
-        </article>
-      </div>
+      <button type="button" role="tab" id="tab-mech" aria-controls="panel-mech" aria-selected="true">仕組み</button>
+      <button type="button" role="tab" id="tab-lp" aria-controls="panel-lp" aria-selected="false" tabindex="-1">フォーム・予約画面の見本</button>
     </div>
 
     <div role="tabpanel" id="panel-mech" aria-labelledby="tab-mech">
@@ -782,6 +789,39 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
         </article>
       </div>
     </div>
+
+    <div role="tabpanel" id="panel-lp" aria-labelledby="tab-lp">
+      <h3 class="panel-title">フォーム・予約画面の見本</h3>
+      <div class="sites">
+        <article class="site">
+          <img src="assets/images/demo-crosstech.webp" width="1440" height="900" loading="lazy" decoding="async" alt="CROSSTECH ARCHITECTS のトップページ。暗い執務室の写真の上に「バックオフィスを、次世代のエンジンへ。」という見出しと、無料シミュレーション・相談のボタンが置かれている。">
+          <div>
+            <h4>株式会社クロステック・アーキテクツ<span class="nw">（架空）</span></h4>
+            <p>GASと連携した問い合わせフォームの見本です。中小企業向けの業務自動化コンサルを想定しています</p>
+            <dl><dt>見どころ</dt><dd>GASと連携したフォーム／導入効果を試算するスライダー／ダークモード</dd></dl>
+            <p><a href="https://wada3333.github.io/crosstech-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/crosstech-lp/</a></p>
+          </div>
+        </article>
+        <article class="site">
+          <img src="assets/images/demo-studio-core.webp" width="1440" height="900" loading="lazy" decoding="async" alt="STUDIO CORE のトップページ。明るい個室スタジオの写真の上に「続かなかった人が、続けている。」という見出しと、無料カウンセリングを予約するボタンが置かれている。">
+          <div>
+            <h4>STUDIO CORE<span class="nw">（架空のパーソナルジム）</span></h4>
+            <p>無料カウンセリングの予約画面の見本です。申し込みまでの流れを重視して作りました</p>
+            <dl><dt>見どころ</dt><dd>予約フォームの空き枠表示／表示速度／計測イベントの設計</dd></dl>
+            <p><a href="https://wada3333.github.io/studio-core-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/studio-core-lp/</a></p>
+          </div>
+        </article>
+        <article class="site">
+          <img src="assets/images/demo-bloom.webp" width="1440" height="900" loading="lazy" decoding="async" alt="BLOOM（架空の美容室）のトップページ。レンガの壁の店内の写真の上に「あなたらしさが、咲く場所。」という見出しと、予約するボタンが置かれている。">
+          <div>
+            <h4>BLOOM<span class="nw">（架空の美容室）</span></h4>
+            <p>予約までを4ステップにまとめた予約画面の見本です</p>
+            <dl><dt>見どころ</dt><dd>4ステップ予約／Before・After スライダー</dd></dl>
+            <p><a href="https://wada3333.github.io/bloom-salon-lp/" target="_blank" rel="noopener noreferrer">https://wada3333.github.io/bloom-salon-lp/</a></p>
+          </div>
+        </article>
+      </div>
+    </div>
   </section>
 
   <!-- 5 ランサーズのパッケージ -->
@@ -797,7 +837,7 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
       </li>
       <li class="pkg" id="pkg-research">
         <img src="assets/images/pkg-research.webp" width="800" height="450" loading="lazy" decoding="async" alt="企業・店舗・製品を1件ずつ調べてリストにするパッケージの表紙。公式ページで確かめて出典URLを残し、載っていない項目は空欄のままにする。営業リスト・競合調査向け。面談不要、10,000円〜。">
-        <h3>リサーチ・リスト作成｜Webで調べた情報を一覧表にまとめます</h3>
+        <h3>営業リスト作成・リサーチ｜1件ずつ調べて出典URL付きの一覧表にします</h3>
         <p class="price">10,000円〜</p>
         <a class="btn btn--sub" href="https://www.lancers.jp/menu/detail/1347455" target="_blank" rel="noopener noreferrer">詳細を見る</a>
       </li>
@@ -809,19 +849,19 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
       </li>
       <li class="pkg" id="pkg-line">
         <img src="assets/images/pkg-line.webp" width="800" height="450" loading="lazy" decoding="async" alt="LINEに送るだけでシートへ自動転記するパッケージの表紙。現場の日報をシートへ自動で記録し、在庫数・発注依頼を一覧にまとめ、期限が近づいたら担当者へお知らせする。面談不要、15,000円〜。">
-        <h3>LINEに送るだけ！日報・在庫報告をスプレッドシートへ自動転記</h3>
+        <h3>LINEに送るだけ！日報・在庫報告をスプレッドシートへ自動転記します</h3>
         <p class="price">15,000円〜</p>
         <a class="btn btn--sub" href="https://www.lancers.jp/menu/detail/1334115" target="_blank" rel="noopener noreferrer">詳細を見る</a>
       </li>
       <li class="pkg" id="pkg-gas">
         <img src="assets/images/pkg-gas.webp" width="800" height="450" loading="lazy" decoding="async" alt="スプレッドシートの転記・集計を自動化するパッケージの表紙。フォームの回答を担当者別に振り分け、毎朝の一覧をメールで送り、入力漏れのある行を色分けする。面談不要、10,000円〜。">
-        <h3>スプレッドシートの転記・集計・メール通知等をGASで自動化</h3>
+        <h3>【月2件限定】GASでスプレッドシートの転記・集計・通知を1万円で自動化します</h3>
         <p class="price">10,000円〜</p>
         <a class="btn btn--sub" href="https://www.lancers.jp/menu/detail/1334107" target="_blank" rel="noopener noreferrer">詳細を見る</a>
       </li>
       <li class="pkg" id="pkg-recon">
         <img src="assets/images/pkg-recon.webp" width="800" height="450" loading="lazy" decoding="async" alt="入金消込を自動化するパッケージの表紙。銀行CSVと売上表を自動で突き合わせ、入金漏れ・金額ズレだけを一覧にする。面談不要でチャット完結、15,000円〜。">
-        <h3>入金消込（売上と入金の突合）をGASで自動化</h3>
+        <h3>簿記2級SEが入金消込（売上と入金の突合）をGASで自動化します</h3>
         <p class="price">15,000円〜</p>
         <a class="btn btn--sub" href="https://www.lancers.jp/menu/detail/1336560" target="_blank" rel="noopener noreferrer">詳細を見る</a>
       </li>
@@ -846,7 +886,6 @@ html.js .panel-title{position:absolute!important;width:1px;height:1px;margin:-1p
           <span class="opt"><input type="radio" name="q1" id="q1-list" value="list"><label for="q1-list">リストづくり・調べもの</label></span>
           <span class="opt"><input type="radio" name="q1" id="q1-sheet" value="sheet"><label for="q1-sheet">Excel・スプレッドシートの表</label></span>
           <span class="opt"><input type="radio" name="q1" id="q1-auto" value="auto"><label for="q1-auto">作業の自動化（GAS・LINE・メールなど）</label></span>
-          <span class="opt"><input type="radio" name="q1" id="q1-lp" value="lp"><label for="q1-lp">LP（ホームページ）</label></span>
           <span class="opt"><input type="radio" name="q1" id="q1-tax" value="tax"><label for="q1-tax">確定申告の書類づくり・税務の相談</label></span>
           <span class="opt"><input type="radio" name="q1" id="q1-other" value="other"><label for="q1-other">それ以外</label></span>
         </div>

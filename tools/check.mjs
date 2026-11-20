@@ -350,17 +350,16 @@ try {
     const q = async (js) => JSON.parse(await evaluate(`JSON.stringify((() => { ${js} })())`));
     const state = () => q(`${VIS} return { lp: vis(document.getElementById('panel-lp')), mech: vis(document.getElementById('panel-mech')), sel: [...document.querySelectorAll('[role=tab]')].map(t => t.getAttribute('aria-selected')).join() };`);
     const t0 = await state();
-    await evaluate(`document.getElementById('tab-mech').click(); 1`);
+    await evaluate(`document.getElementById('tab-lp').click(); 1`);
     const t1 = await state();
-    await evaluate(`document.getElementById('tab-mech').focus(); 1`);
+    await evaluate(`document.getElementById('tab-lp').focus(); 1`);
     await send('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'ArrowLeft', code: 'ArrowLeft', windowsVirtualKeyCode: 37 });
     await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'ArrowLeft', code: 'ArrowLeft', windowsVirtualKeyCode: 37 });
     const t2 = await state();
-    await evaluate(`document.getElementById('tab-mech').click(); document.querySelector('[data-open-tab=lp]').click(); 1`);
-    const t3 = await state();
-    record(t0.lp && !t0.mech && t1.mech && !t1.lp && t2.lp && !t2.mech && t2.sel === 'true,false' && t3.lp && !t3.mech,
-      '自主制作のタブ: クリックと矢印キーで切り替わり、「自主制作のLPを見る」でLPが開く',
-      `初期 LP${t0.lp ? '○' : '×'}/仕組み${t0.mech ? '○' : '×'} → 仕組みをクリック LP${t1.lp ? '○' : '×'}/仕組み${t1.mech ? '○' : '×'} → ← キー ${t2.sel}`);
+    const order = await q(`return [...document.querySelectorAll('[role=tab]')].map(t => t.id).join();`);
+    record(t0.mech && !t0.lp && t1.lp && !t1.mech && t2.mech && !t2.lp && t2.sel === 'true,false' && order === 'tab-mech,tab-lp',
+      '自主制作のタブ: 「仕組み」が先で初期表示。クリックと矢印キーで「フォーム・予約画面の見本」と切り替わる',
+      `初期 仕組み${t0.mech ? '○' : '×'}/見本${t0.lp ? '○' : '×'} → 見本をクリック 仕組み${t1.mech ? '○' : '×'}/見本${t1.lp ? '○' : '×'} → ← キー ${t2.sel} / 並び ${order}`);
   }
 
   // =========================================================================
@@ -401,7 +400,7 @@ try {
       for (const b of bad) metaBad.push(`${w}px:${b}`);
     }
     record(metaBad.length === 0, '実績カードのメタ情報が、全部1行か縦積み（区切り線なし）のどちらかで、途中だけ折り返さない（320〜1280px）',
-      metaBad.length ? '崩れ: ' + metaBad.join(', ') : '5件 × 7つの幅で検査');
+      metaBad.length ? '崩れ: ' + metaBad.join(', ') : '全カード × 7つの幅で検査');
 
     // デモ名の「（架空…）」が途中で切れない（PC・スマホ・最小幅）
     const broken = [];
@@ -432,9 +431,8 @@ try {
   await load(1280, 900);
   {
     const cases = [
-      ['リスト＋チャット → 相談', [['q1', 'list'], ['q2', 'chat']], 'consult', ''],
-      ['表＋チャット → 相談', [['q1', 'sheet'], ['q2', 'chat']], 'consult', ''],
-      ['LP＋チャット → 相談', [['q1', 'lp'], ['q2', 'chat']], 'consult', ''],
+      ['リスト＋チャット → パッケージ', [['q1', 'list'], ['q2', 'chat']], 'pkg', 'リサーチ・リスト作成'],
+      ['表＋チャット → パッケージ', [['q1', 'sheet'], ['q2', 'chat']], 'pkg', '入力だけで集計'],
       ['それ以外＋チャット → 相談', [['q1', 'other'], ['q2', 'chat']], 'consult', ''],
       ['自動化(LINE) → パッケージ', [['q1', 'auto'], ['q2', 'chat'], ['q3', 'line']], 'pkg', 'LINEに送るだけ'],
       ['自動化(転記集計) → パッケージ', [['q1', 'auto'], ['q2', 'chat'], ['q3', 'gas']], 'pkg', 'スプレッドシートの転記'],
@@ -483,7 +481,7 @@ try {
       const ok = Object.entries(want).every(([k, v]) => s[k] === v) && s.stats && s.headerCta;
       rows.push({ query: query || '（なし）', ok, s });
     }
-    record(rows.every((r) => r.ok), '?from= による出し分けが §7 の表どおり（評価の数字は常に出る）',
+    record(rows.every((r) => r.ok), '?from= による出し分けが §7 の表どおり（ランサーズの評価の数字は常に出る）',
       rows.map((r) => `${r.query}: パッケージ${r.s.packages ? '○' : '×'} LC${r.s.lc ? '○' : '×'} CW${r.s.cw ? '○' : '×'}`).join(' / '));
 
     // ページ内の移動（ハッシュ）後も、決めた値が保たれる
@@ -495,13 +493,30 @@ try {
     const viaCw = await diagRun([['q1', 'auto'], ['q2', 'chat'], ['q3', 'line']]);
     await load(1280, 900, { query: '?from=lc' });
     const viaLc = await diagRun([['q1', 'auto'], ['q2', 'chat'], ['q3', 'line']]);
-    const viaLcConsult = await diagRun([['q1', 'list'], ['q2', 'chat']]);
+    const viaLcConsult = await diagRun([['q1', 'other'], ['q2', 'chat']]);
     await load(1280, 900, { query: '?from=cw' });
-    const viaCwConsult = await diagRun([['q1', 'list'], ['q2', 'chat']]);
+    const viaCwConsult = await diagRun([['q1', 'other'], ['q2', 'chat']]);
     record(kept.channel === 'cw' && !kept.packages && viaCw.keys.join() === 'consult' && viaLc.keys.join() === 'pkg' &&
       viaLcConsult.btns.join() === 'lc' && viaCwConsult.btns.join() === 'cw',
       '?from=cw では診断もパッケージを返さず、結果のボタンも来た場所に合わせる。ハッシュ移動後も保たれる',
       `移動後 ${kept.channel}・パッケージ${kept.packages ? '○' : '×'} / CW+自動化→${viaCw.keys.join()} / LC+自動化→${viaLc.keys.join()} / 相談ボタン LC:${viaLcConsult.btns.join()} CW:${viaCwConsult.btns.join()}`);
+  }
+
+  // ---- ?from=lc では CW の導線と表示が出ない / LP制作は受けない ----
+  {
+    await load(1280, 900, { query: '?from=lc' });
+    const lc = JSON.parse(await evaluate(`(() => {
+      const t = document.body.innerText;
+      const links = [...document.querySelectorAll('a[href*="crowdworks"]')].filter(a => a.getBoundingClientRect().width > 0).length;
+      return JSON.stringify({ cwText: /クラウドワークス|CrowdWorks/i.test(t), links, others: (t.match(/他のサイト/g) || []).length });
+    })()`));
+    record(!lc.cwText && lc.links === 0 && lc.others >= 3, '?from=lc では、クラウドワークスの名前・リンク・評価の表示が出ない（実績の媒体名は「他のサイト」になる）',
+      `「クラウドワークス」の文字 ${lc.cwText ? 'あり' : 'なし'} / リンク ${lc.links}本 / 「他のサイト」${lc.others}か所`);
+
+    await load(1280, 900);
+    const lp = JSON.parse(await evaluate(`JSON.stringify({ work: /LP制作/.test(document.documentElement.textContent), opt: !!document.getElementById('q1-lp'), head: document.title + document.querySelector('.head__role').textContent })`));
+    record(!lp.work && !lp.opt, '「LP制作」を、できること・診断・タイトル・見出しのどこにも出していない（自主制作のデモは残す）',
+      `「LP制作」の文字 ${lp.work ? 'あり' : 'なし'} / 診断のLP選択肢 ${lp.opt ? 'あり' : 'なし'}`);
   }
 
   // =========================================================================
@@ -648,10 +663,12 @@ try {
       ['実績1', '家賃・経費を1行ずつ入力するだけで'], ['実績1の結果', '評価5.0（全項目満点）'], ['実績2', '次回も相談したいと思います'],
       ['実績3', '急な依頼を要望通りにやって頂きありがとうございました'], ['実績4', '本番まで伴走までして頂き本当にありがとうございました'],
       ['実績5', 'とても丁寧に対応いただきました'],
+      ['実績（学習塾リスト）', '1回400件を3回、計1,200件をExcelで納品'], ['実績（メーカー営業リスト）', '想像以上のスピードで作業を完了していただきました'],
+      ['実績（4回目・5回目）', '迅速に的確に作成頂きありがとうございます'],
       ['税務の注記', '税務相談や申告書の作成代行は行っていません'],
       ['リスト整形（整形後の表）', '整形後の店舗リスト'], ['Excel管理表（結果の表）', '年間合計'],
       ['GAS実行（結果）', '5件を記録しました。1件は形式が読み取れなかったため'],
-      ['自主制作 LP タブ', 'BLOOM（架空の美容室）'], ['自主制作 仕組みタブ', 'GAS勤怠管理'], ['仕組みタブ（突合）', '売上・入金データの夜間自動突合'],
+      ['自主制作 フォーム・予約画面の見本タブ', 'BLOOM（架空の美容室）'], ['自主制作 仕組みタブ', 'GAS勤怠管理'], ['仕組みタブ（突合）', '売上・入金データの夜間自動突合'],
       ['パッケージ', '15,000円〜'], ['パッケージ名', '入金消込（売上と入金の突合）をGASで自動化'],
       ['診断（判定の表）', '作業の自動化で、LINEの報告'], ['診断（結果A）', 'すみません、この条件ではお受けできません'],
       ['診断（結果の相談）', '内容を伺ってから判断します'],
@@ -689,7 +706,7 @@ try {
       const prices = [...document.querySelectorAll('.pkg .price')].map(p => p.textContent.trim());
       return JSON.stringify({ bad, prices });
     })()`));
-    record(yen.bad.length === 0 && yen.prices.join() === '15,000円〜,10,000円〜,15,000円〜,15,000円〜',
+    record(yen.bad.length === 0 && yen.prices.join() === '10,000円〜,10,000円〜,10,000円〜,15,000円〜,10,000円〜,15,000円〜,15,000円〜',
       '料金は、ランサーズのパッケージの価格（「〜」付き）だけ',
       yen.bad.length ? '欄の外に「円」: ' + yen.bad.join(' / ') : `「円」を含む文字列はすべてパッケージの欄の中。価格 ${yen.prices.join(' / ')}`);
 
@@ -722,8 +739,8 @@ try {
       ogUrl: g('meta[property="og:url"]', 'content'), canonical: g('link[rel=canonical]', 'href'), ogTitle: g('meta[property="og:title"]', 'content'),
       desc: g('meta[name=description]', 'content'), ogDesc: g('meta[property="og:description"]', 'content') }); })()`));
     const abs = 'https://wada3333.github.io/portfolio/';
-    record(meta.ogImage === abs + 'assets/og.png?v=3' && meta.twImage === meta.ogImage && meta.ogUrl === abs && meta.canonical === abs && meta.desc && meta.desc === meta.ogDesc,
-      'OGP: og:image・twitter:image は絶対URLで ?v=3、og:url と canonical が設定されている', `og:image ${meta.ogImage}`);
+    record(meta.ogImage === abs + 'assets/og.png?v=4' && meta.twImage === meta.ogImage && meta.ogUrl === abs && meta.canonical === abs && meta.desc && meta.desc === meta.ogDesc,
+      'OGP: og:image・twitter:image は絶対URLで ?v=4、og:url と canonical が設定されている', `og:image ${meta.ogImage}`);
     const og = join(ROOT, 'assets/og.png');
     const buf = readFileSync(og);
     const [ow, oh] = [buf.readUInt32BE(16), buf.readUInt32BE(20)];

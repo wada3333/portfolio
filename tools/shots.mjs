@@ -96,7 +96,7 @@ try {
         ['gas', '#demo-gas', `document.querySelector('#demo-gas [data-act=run]').click()`, 4200],
         ['list', '#demo-list', `document.querySelector('#demo-list [data-act=unify]').click(); document.querySelector('#demo-list [data-act=dedupe]').click()`, 1200],
         ['sheet', '#demo-sheet', `(() => { const d = document.querySelector('#demo-sheet'); d.querySelector('[data-f=month]').value = '7'; d.querySelector('[data-f=kind]').value = 'ex'; d.querySelector('[data-f=amount]').value = '30000'; d.querySelector('[data-act=add]').click(); })()`, 400],
-        ['mech', '#makes', `document.getElementById('tab-mech').click()`, 400],
+        ['lp', '#makes', `document.getElementById('tab-lp').click()`, 400],
         ['diag-pkg', '#check', `(() => { for (const [n, v] of [['q1','auto'],['q2','chat'],['q3','gas']]) { const e = document.querySelector('input[name=' + n + '][value=' + v + ']'); e.checked = true; e.dispatchEvent(new Event('change', { bubbles: true })); } })()`, 500],
         ['diag-tax', '#check', `(() => { document.querySelector('[data-act=diag-reset]').click(); for (const [n, v] of [['q1','tax'],['q2','chat']]) { const e = document.querySelector('input[name=' + n + '][value=' + v + ']'); e.checked = true; e.dispatchEvent(new Event('change', { bubbles: true })); } })()`, 500]
       ];

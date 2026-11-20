@@ -67,8 +67,8 @@ function initTabs() {
       t.setAttribute('aria-selected', String(on));
       t.tabIndex = on ? 0 : -1;
       const panel = document.getElementById(t.getAttribute('aria-controls'));
-      // LP は初期状態で開いている（is-closed で閉じる）、仕組みは初期状態で閉じている（is-open で開く）
-      if (panel.id === 'panel-lp') panel.classList.toggle('is-closed', !on);
+      // 仕組みは初期状態で開いている（is-closed で閉じる）、フォーム・予約画面の見本は初期状態で閉じている（is-open で開く）
+      if (panel.id === 'panel-mech') panel.classList.toggle('is-closed', !on);
       else panel.classList.toggle('is-open', on);
     }
     if (moveFocus) tab.focus();
@@ -84,9 +84,6 @@ function initTabs() {
       else if (e.key === 'End') to = last;
       if (to !== null) { e.preventDefault(); select(tabs[to], true); }
     });
-  }
-  for (const link of $$('[data-open-tab]')) {
-    link.addEventListener('click', () => select(tabs[link.dataset.openTab === 'lp' ? 0 : 1]));
   }
 }
 
